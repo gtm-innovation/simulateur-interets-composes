@@ -1,0 +1,838 @@
+<!-- Calculateur d'Intérêts Composés — MoneyRadar -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+/* ===== CALCULATEUR INTÉRÊTS COMPOSÉS — V2 PREMIUM ===== */
+.mric-calc {
+  --teal:#00F5C0;--teal-dim:rgba(0,245,192,0.08);--teal-b:rgba(0,245,192,0.3);
+  --blue:#1060C4;
+  --navy:#0B1120;--navy2:#131F35;--navy3:#1A2847;
+  --light:#F4F7FF;--light2:#EAF0FF;
+  --lt:#1A2847;--lsub:#4A5D7A;--lborder:#D0DCEF;
+  --dsub:#C5D5E8;--dborder:rgba(255,255,255,0.07);
+  --green:#00F5C0;--red:#FF3B4E;
+  --pattern-svg:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2300F5C0' fill-opacity='0.07'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  --glass:rgba(255,255,255,0.03);
+  --glass-border:rgba(255,255,255,0.08);
+  --glow:0 0 80px rgba(0,245,192,0.08);
+  width:100%;max-width:100%;box-sizing:border-box;overflow-x:hidden;
+}
+.mric-calc *,.mric-calc *::before,.mric-calc *::after{box-sizing:border-box}
+
+.mric-calc .inn{max-width:760px;margin:0 auto;padding:80px 24px}
+.mric-calc .inn-wide{max-width:1100px;margin:0 auto;padding:56px 24px}
+
+/* Sections */
+.mric-calc .dk{background:var(--navy);color:#EFF4FF;position:relative}
+.mric-calc .lt{background:var(--light);color:var(--lt);position:relative}
+
+/* Decorative mesh on dark sections */
+.mric-calc .dk::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:
+  radial-gradient(ellipse 600px 400px at 10% 20%, rgba(0,245,192,0.03) 0%, transparent 70%),
+  radial-gradient(ellipse 500px 300px at 90% 80%, rgba(16,96,196,0.04) 0%, transparent 70%);
+  pointer-events:none}
+.mric-calc .dk>*{position:relative;z-index:1}
+
+/* Labels */
+.mric-calc .lbl{font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--teal);margin-bottom:12px;display:block}
+.mric-calc .lt .lbl{color:#243842}
+.mric-calc .lbl::before{content:'— ';opacity:.5}
+
+/* Titles & text */
+.mric-calc .stitle{font-size:clamp(26px,3.5vw,40px);font-weight:800;margin-bottom:20px;line-height:1.15;letter-spacing:-0.02em}
+.mric-calc .dk .stitle{background:linear-gradient(135deg,#EFF4FF 0%,#A8BDD6 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.mric-calc .btxt{font-size:16px;margin-bottom:18px;line-height:1.75}
+.mric-calc .dk .btxt{color:var(--dsub)}
+.mric-calc .lt .btxt{color:var(--lsub)}
+.mric-calc .btxt strong{color:#EFF4FF}
+.mric-calc .lt .btxt strong{color:var(--lt)}
+
+/* ===== HERO ===== */
+.mric-calc .mric-hero{text-align:center;position:relative;overflow:hidden;background-image:var(--pattern-svg),radial-gradient(ellipse 75% 50% at 50% 0%,rgba(0,245,192,.28) 0%,rgba(0,245,192,.10) 40%,rgba(0,245,192,.02) 65%,transparent 80%);background-color:var(--navy)}
+.mric-calc .mric-hero>*{position:relative;z-index:1}
+.mric-calc .mric-hero-logo{display:block;margin:0 auto 28px;height:32px;width:auto;opacity:.85}
+@keyframes mric-shimmer{0%{background-position:0% center}100%{background-position:200% center}}
+.mric-calc .mric-hero h1{font-size:clamp(30px,4.5vw,52px);font-weight:800;line-height:1.1;letter-spacing:-.03em;max-width:700px;margin:0 auto 20px;color:#EFF4FF}
+.mric-calc .mric-hero h1 em{font-style:normal;color:var(--teal)}
+.mric-calc .mric-hero-sub{font-size:clamp(15px,1.7vw,17px);color:#A8BDD6;max-width:560px;margin:0 auto;font-weight:400}
+.mric-calc .mric-hero .inn{padding-top:60px;padding-bottom:50px}
+
+/* ===== TOOL SECTION ===== */
+.mric-calc .mric-tool-section{
+  background:var(--navy2);
+  border-top:1px solid var(--glass-border);
+  border-bottom:1px solid var(--glass-border);
+  position:relative;
+}
+.mric-calc .mric-tool-section::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;
+  background:radial-gradient(ellipse 800px 600px at 30% 0%, rgba(0,245,192,0.04) 0%, transparent 70%);pointer-events:none}
+.mric-calc .mric-tool-section>*{position:relative;z-index:1}
+
+.mric-calc .mric-tool-grid{display:block}
+
+/* Form column */
+.mric-calc .mric-form-col{
+  padding:24px;border-radius:16px;
+  background:rgba(11,17,32,0.7);
+  border:1px solid rgba(0,245,192,0.12);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  padding-bottom:28px;margin-bottom:28px;
+  box-shadow:0 4px 32px rgba(0,0,0,0.25), 0 0 60px rgba(0,245,192,0.04);
+}
+.mric-calc .mric-form-col .lbl{margin-bottom:16px}
+.mric-calc .mric-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px}
+.mric-calc .mric-field label{display:block;font-size:11px;font-weight:700;color:var(--dsub);margin-bottom:8px;letter-spacing:.04em;text-transform:uppercase}
+.mric-calc .mric-input-wrap{position:relative}
+.mric-calc .mric-input-wrap input{
+  width:100%;padding:14px 44px 14px 16px;
+  border:1px solid rgba(255,255,255,0.10);border-radius:10px;
+  background:rgba(11,17,32,0.8);color:#EFF4FF;
+  transition:all .25s cubic-bezier(.4,0,.2,1);
+  box-sizing:border-box;-moz-appearance:textfield;font-size:16px;font-weight:600;
+}
+.mric-calc .mric-input-wrap input::-webkit-outer-spin-button,
+.mric-calc .mric-input-wrap input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.mric-calc .mric-input-wrap input:focus{
+  outline:none;border-color:var(--teal);
+  box-shadow:0 0 0 3px rgba(0,245,192,.1), 0 0 24px rgba(0,245,192,.06);
+  background:rgba(11,17,32,0.95);
+}
+.mric-calc .mric-input-suffix{position:absolute;right:16px;top:50%;transform:translateY(-50%);color:rgba(197,213,232,0.5);pointer-events:none;font-weight:600;font-size:13px}
+
+/* Button */
+.mric-calc .mric-btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:10px;
+  font-size:15px;font-weight:700;padding:16px 24px;border-radius:10px;
+  text-decoration:none;transition:all .3s cubic-bezier(.4,0,.2,1);
+  letter-spacing:.02em;border:none;cursor:pointer;width:100%;color:#0B1120;
+  background:var(--teal);
+  box-shadow:0 4px 24px rgba(0,245,192,0.25), inset 0 1px 0 rgba(255,255,255,0.2);
+  position:relative;overflow:hidden;
+}
+.mric-calc .mric-btn::before{
+  content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.15),transparent);
+  transition:left .5s ease;
+}
+.mric-calc .mric-btn:hover{
+  transform:translateY(-2px);
+  box-shadow:0 8px 40px rgba(0,245,192,0.35), inset 0 1px 0 rgba(255,255,255,0.2);
+}
+.mric-calc .mric-btn:hover::before{left:100%}
+.mric-calc .mric-btn:active{transform:translateY(0)}
+.mric-calc .mric-btn svg{flex-shrink:0}
+
+/* Results column */
+.mric-calc .mric-results-col{min-width:0;max-width:100%}
+.mric-calc .mric-results{display:none;max-width:100%}
+.mric-calc .mric-results.mric-visible{display:block}
+
+/* Stats row */
+.mric-calc .mric-stats-row{display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:20px}
+.mric-calc .mric-stat{
+  background:rgba(11,17,32,0.6);
+  border:1px solid var(--glass-border);border-radius:14px;
+  padding:20px 16px;text-align:center;
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  transition:all .3s cubic-bezier(.4,0,.2,1);
+  position:relative;overflow:hidden;
+}
+.mric-calc .mric-stat::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;
+  background:radial-gradient(ellipse at 50% 0%, rgba(0,245,192,0.03) 0%, transparent 70%);pointer-events:none;opacity:0;
+  transition:opacity .3s}
+.mric-calc .mric-stat:hover::before{opacity:1}
+.mric-calc .mric-stat:hover{border-color:rgba(0,245,192,0.12);transform:translateY(-2px);box-shadow:var(--glow)}
+.mric-calc .mric-stat.mric-primary{border-color:rgba(0,245,192,0.15)}
+.mric-calc .mric-stat.mric-primary::after{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--teal),var(--blue),var(--teal));
+  background-size:200% auto;animation:mric-shimmer 3s linear infinite;
+}
+.mric-calc .mric-stat-num{font-size:clamp(20px,2.5vw,30px);font-weight:800;color:var(--teal);line-height:1;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mric-calc .mric-stat-num.mric-white{color:#EFF4FF;font-size:clamp(18px,2vw,24px)}
+.mric-calc .mric-stat-lbl{font-size:10px;color:rgba(197,213,232,0.6);letter-spacing:.08em;text-transform:uppercase;font-weight:700}
+
+/* Bar */
+.mric-calc .mric-bar-section{margin-bottom:20px}
+.mric-calc .mric-bar-track{
+  display:flex;height:32px;
+  background:rgba(11,17,32,0.6);border-radius:10px;overflow:hidden;
+  border:1px solid var(--glass-border);
+  box-shadow:inset 0 2px 6px rgba(0,0,0,0.2);
+}
+.mric-calc .mric-bar-fill{height:100%;display:flex;align-items:center;justify-content:center;transition:width .8s cubic-bezier(.34,1.56,.64,1);overflow:hidden;min-width:0}
+.mric-calc .mric-bar-v{background:linear-gradient(90deg,#1A2847,#2A3F5C)}
+.mric-calc .mric-bar-i{background:linear-gradient(90deg,var(--teal),var(--blue));box-shadow:0 0 20px rgba(0,245,192,0.2)}
+.mric-calc .mric-bar-pct{color:#fff;font-weight:800;font-size:11px;white-space:nowrap;padding:0 8px;letter-spacing:.02em;text-shadow:0 1px 2px rgba(0,0,0,0.3)}
+.mric-calc .mric-bar-legend{display:flex;gap:20px;margin-top:10px;flex-wrap:wrap}
+.mric-calc .mric-bar-legend-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--dsub)}
+.mric-calc .mric-bar-legend-item strong{color:#EFF4FF;font-size:13px;font-weight:700}
+.mric-calc .mric-ldot{width:8px;height:8px;border-radius:3px;flex-shrink:0}
+.mric-calc .mric-ldot-v{background:#2A3F5C}
+.mric-calc .mric-ldot-i{background:var(--teal);box-shadow:0 0 6px rgba(0,245,192,0.4)}
+
+/* Chart */
+.mric-calc .mric-chart-wrap{margin-bottom:16px}
+.mric-calc .mric-chart-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.mric-calc .mric-chart-title{font-weight:700;font-size:14px;color:#EFF4FF;letter-spacing:.01em}
+.mric-calc #mric-chart{
+  width:100%;border-radius:12px;
+  border:1px solid var(--glass-border);
+  background:rgba(11,17,32,0.5);
+  box-shadow:0 4px 24px rgba(0,0,0,0.15);
+}
+
+/* Summary */
+.mric-calc .qblock{
+  border-left:3px solid var(--teal);padding:18px 22px;
+  border-radius:0 12px 12px 0;margin-bottom:16px;
+  font-size:14px;font-weight:400;line-height:1.7;
+  box-shadow:0 2px 16px rgba(0,0,0,0.1);
+}
+.mric-calc .dk .qblock{background:rgba(0,245,192,0.04);color:#EFF4FF;border:1px solid rgba(0,245,192,0.08);border-left:3px solid var(--teal)}
+.mric-calc .lt .qblock{background:rgba(0,245,192,.07);color:var(--lt);border-color:#243842}
+.mric-calc .qblock strong{font-weight:700}
+
+/* Toggle */
+.mric-calc .mric-toggle{
+  display:inline-flex;align-items:center;gap:6px;padding:8px 16px;
+  background:rgba(255,255,255,0.03);border:1px solid var(--glass-border);
+  border-radius:8px;color:#EFF4FF;cursor:pointer;transition:all .25s;font-weight:600;font-size:12px;
+}
+.mric-calc .mric-toggle:hover{border-color:rgba(0,245,192,0.2);color:var(--teal);background:rgba(0,245,192,.04)}
+.mric-calc .mric-chevron{transition:transform .3s}
+.mric-calc .mric-toggle.mric-open .mric-chevron{transform:rotate(180deg)}
+
+/* Table */
+.mric-calc .mric-table-full{margin-top:0;padding:0 24px 32px}
+.mric-calc .mric-table-container{display:none}
+.mric-calc .mric-table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.mric-calc .mric-table{width:100%;border-collapse:collapse;border-radius:12px;overflow:hidden}
+.mric-calc .mric-table thead{background:rgba(11,17,32,0.8)}
+.mric-calc .mric-table th{padding:14px 16px;text-align:right;color:rgba(197,213,232,0.6);font-weight:700;white-space:nowrap;font-size:10px;letter-spacing:.12em;text-transform:uppercase;border-bottom:1px solid var(--glass-border)}
+.mric-calc .mric-table th:first-child{text-align:center}
+.mric-calc .mric-table td{padding:12px 16px;text-align:right;white-space:nowrap;font-size:13px;border-bottom:1px solid rgba(255,255,255,0.04);color:var(--dsub);font-weight:500}
+.mric-calc .mric-table td:first-child{text-align:center;font-weight:700;color:#EFF4FF}
+.mric-calc .mric-table td:last-child{font-weight:700;color:var(--teal)}
+.mric-calc .mric-table tbody tr{transition:all .2s}
+.mric-calc .mric-table tbody tr:hover{background:rgba(0,245,192,.03)}
+
+/* ===== Educational sections ===== */
+.mric-calc .srow{display:grid;grid-template-columns:1fr;gap:14px;margin:32px 0}
+.mric-calc .dk .scard{
+  background:rgba(255,255,255,0.02);border:1px solid var(--glass-border);
+  border-radius:14px;padding:28px 20px;text-align:center;
+  transition:all .3s cubic-bezier(.4,0,.2,1);position:relative;overflow:hidden;
+}
+.mric-calc .dk .scard::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;
+  background:radial-gradient(ellipse at 50% 0%, rgba(0,245,192,0.04) 0%, transparent 70%);
+  opacity:0;transition:opacity .3s;pointer-events:none}
+.mric-calc .dk .scard:hover{border-color:rgba(0,245,192,0.12);transform:translateY(-3px);box-shadow:var(--glow)}
+.mric-calc .dk .scard:hover::before{opacity:1}
+
+.mric-calc .lt .scard{
+  background:#fff;border:1px solid var(--lborder);border-radius:14px;padding:28px 20px;text-align:center;
+  box-shadow:0 2px 16px rgba(0,0,0,.04);transition:all .3s cubic-bezier(.4,0,.2,1);
+}
+.mric-calc .lt .scard:hover{transform:translateY(-3px);box-shadow:0 8px 32px rgba(0,0,0,.08)}
+
+.mric-calc .scard .num{font-size:clamp(26px,3vw,40px);font-weight:800;color:var(--teal);line-height:1;margin-bottom:10px}
+.mric-calc .lt .scard .num{color:#243842}
+.mric-calc .scard .lbl2{font-size:13px;line-height:1.5}
+.mric-calc .dk .scard .lbl2{color:var(--dsub)}
+.mric-calc .lt .scard .lbl2{color:var(--lsub)}
+
+/* Cards */
+.mric-calc .cgrid{display:grid;gap:12px;margin:28px 0}
+.mric-calc .card{
+  border-radius:14px;padding:24px 24px 24px 20px;display:flex;gap:16px;align-items:flex-start;
+  transition:all .3s cubic-bezier(.4,0,.2,1);position:relative;overflow:hidden;
+}
+.mric-calc .dk .card{background:rgba(255,255,255,0.02);border:1px solid var(--glass-border)}
+.mric-calc .dk .card:hover{border-color:rgba(0,245,192,0.12);transform:translateY(-2px);box-shadow:var(--glow)}
+.mric-calc .lt .card{background:#fff;border:1px solid var(--lborder);box-shadow:0 2px 12px rgba(0,0,0,.04)}
+.mric-calc .lt .card:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,.08)}
+.mric-calc .cnum{font-size:36px;font-weight:800;line-height:1;flex-shrink:0;min-width:48px;margin-top:-2px;opacity:.4}
+.mric-calc .dk .cnum{color:#00F5C0;opacity:.3}
+.mric-calc .lt .cnum{color:#243842}
+.mric-calc .card h3{font-size:17px;font-weight:700;margin-bottom:5px}
+.mric-calc .dk .card h3{color:#EFF4FF}
+.mric-calc .lt .card h3{color:var(--lt)}
+.mric-calc .card p{font-size:14px;margin:0;line-height:1.65}
+.mric-calc .dk .card p{color:var(--dsub)}
+.mric-calc .lt .card p{color:var(--lsub)}
+
+/* Formula card */
+.mric-calc .mric-formula{
+  position:relative;background:rgba(11,17,32,0.7);
+  border:1px solid var(--glass-border);border-radius:14px;
+  padding:28px 28px;margin:24px 0;overflow:hidden;
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+}
+.mric-calc .lt .mric-formula{background:var(--lt);border-color:var(--lt)}
+.mric-calc .mric-formula::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--teal),var(--blue),var(--teal));
+  background-size:200% auto;animation:mric-shimmer 4s linear infinite;
+}
+.mric-calc .mric-formula p{color:#EFF4FF;margin:0 0 8px;line-height:1.6;font-weight:500}
+.mric-calc .lt .mric-formula p{color:#fff}
+.mric-calc .mric-formula ul{padding-left:20px;margin:10px 0 0;list-style:none}
+.mric-calc .mric-formula li{color:#B4C8DE;margin-bottom:4px;font-size:14px;padding-left:16px;position:relative;line-height:1.5}
+.mric-calc .mric-formula li::before{content:'→';position:absolute;left:0;top:0;color:var(--teal);opacity:.5;font-size:12px}
+.mric-calc .mric-formula li strong{color:#EFF4FF}
+
+/* FAQ */
+.mric-calc .flist{margin:24px 0;display:grid;gap:8px}
+.mric-calc .flist details{border-radius:12px;overflow:hidden;transition:all .3s}
+.mric-calc .dk .flist details{background:rgba(255,255,255,0.02);border:1px solid var(--glass-border)}
+.mric-calc .dk .flist details:hover{border-color:rgba(0,245,192,0.1)}
+.mric-calc .dk .flist details[open]{border-color:rgba(0,245,192,0.12);box-shadow:0 0 30px rgba(0,245,192,0.04)}
+.mric-calc .lt .flist details{background:#fff;border:1px solid var(--lborder)}
+.mric-calc .lt .flist details:hover{box-shadow:0 4px 20px rgba(0,0,0,.06)}
+.mric-calc .flist summary{padding:20px 24px;cursor:pointer;font-weight:700;font-size:16px;display:flex;justify-content:space-between;align-items:center;list-style:none;transition:color .2s}
+.mric-calc .dk .flist summary{color:#EFF4FF}
+.mric-calc .lt .flist summary{color:var(--lt)}
+.mric-calc .flist summary::-webkit-details-marker{display:none}
+.mric-calc .flist summary::after{
+  content:'+';font-size:20px;font-weight:400;color:var(--teal);
+  transition:all .3s cubic-bezier(.4,0,.2,1);flex-shrink:0;margin-left:16px;
+  width:28px;height:28px;display:flex;align-items:center;justify-content:center;
+  border-radius:8px;background:rgba(0,245,192,0.06);
+}
+.mric-calc .flist details[open] summary::after{transform:rotate(45deg);background:rgba(0,245,192,0.12)}
+.mric-calc .flist .fans{padding:0 24px 22px;font-size:15px;line-height:1.75}
+.mric-calc .dk .flist .fans{color:var(--dsub)}
+.mric-calc .lt .flist .fans{color:var(--lsub)}
+
+/* ===== CTA Lead Magnet ===== */
+.mric-calc .mric-lm{
+  position:relative;overflow:hidden;border-radius:16px;
+  border:1px solid rgba(0,245,192,0.15);
+  background:linear-gradient(165deg,rgba(11,21,38,0.95) 0%,rgba(7,13,26,0.95) 60%,rgba(10,18,33,0.95) 100%);
+  padding:24px 24px 26px;margin-top:8px;
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+}
+.mric-calc .mric-lm::before{
+  content:'';position:absolute;top:-100px;right:-80px;width:300px;height:300px;
+  background:radial-gradient(circle,rgba(0,245,192,0.1) 0%,transparent 60%);
+  border-radius:50%;pointer-events:none;animation:mric-float 6s ease-in-out infinite;
+}
+.mric-calc .mric-lm::after{
+  content:'';position:absolute;bottom:-60px;left:-40px;width:200px;height:200px;
+  background:radial-gradient(circle,rgba(16,96,196,0.06) 0%,transparent 60%);
+  border-radius:50%;pointer-events:none;
+}
+@keyframes mric-float{0%,100%{transform:translate(0,0)}50%{transform:translate(-10px,10px)}}
+
+.mric-calc .mric-lm-head{position:relative;z-index:1;display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.mric-calc .mric-lm-icon{
+  width:36px;height:36px;border-radius:10px;
+  background:linear-gradient(135deg,rgba(0,245,192,0.15),rgba(16,96,196,0.15));
+  border:1px solid rgba(0,245,192,0.2);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  box-shadow:0 0 16px rgba(0,245,192,0.1);
+}
+.mric-calc .mric-lm-icon svg{width:18px;height:18px;color:var(--teal)}
+.mric-calc .mric-lm-title{font-size:15px;font-weight:700;color:#EFF4FF;line-height:1.3}
+.mric-calc .mric-lm-title span{color:var(--teal)}
+.mric-calc .mric-lm-desc{position:relative;z-index:1;font-size:13px;line-height:1.6;color:var(--dsub);margin-bottom:16px}
+.mric-calc .mric-lm-desc strong{color:#EFF4FF;font-weight:600}
+.mric-calc .mric-lm-row{position:relative;z-index:1;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.mric-calc .mric-lm-row iframe{max-width:100%}
+.mric-calc .mric-lm-fine{font-size:10px;color:rgba(255,255,255,0.3);margin-top:12px;position:relative;z-index:1;letter-spacing:.02em}
+
+/* ===== Section dividers ===== */
+.mric-calc .lt+.dk::before,
+.mric-calc .dk+.lt{position:relative}
+
+/* ===== Animations ===== */
+@keyframes mric-fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.mric-calc .mric-anim{animation:mric-fadeUp .5s cubic-bezier(.16,1,.3,1) forwards;opacity:0}
+.mric-calc .mric-anim-d1{animation-delay:.1s}
+.mric-calc .mric-anim-d2{animation-delay:.2s}
+.mric-calc .mric-anim-d3{animation-delay:.3s}
+.mric-calc .mric-anim-d4{animation-delay:.4s}
+
+/* Scroll reveal for sections */
+.mric-calc section .inn>*,.mric-calc section .inn-wide>*{
+  opacity:0;transform:translateY(16px);
+  transition:opacity .6s cubic-bezier(.16,1,.3,1), transform .6s cubic-bezier(.16,1,.3,1);
+}
+.mric-calc section.mric-visible .inn>*,.mric-calc section.mric-visible .inn-wide>*{
+  opacity:1;transform:translateY(0);
+}
+.mric-calc section.mric-visible .inn>*:nth-child(2){transition-delay:.08s}
+.mric-calc section.mric-visible .inn>*:nth-child(3){transition-delay:.16s}
+.mric-calc section.mric-visible .inn>*:nth-child(4){transition-delay:.24s}
+.mric-calc section.mric-visible .inn>*:nth-child(5){transition-delay:.32s}
+
+/* ===== RESPONSIVE — DESKTOP UPGRADE ===== */
+@media(min-width:961px){
+  .mric-calc .mric-tool-grid{display:grid;grid-template-columns:400px 1fr;gap:36px;align-items:start}
+  .mric-calc .mric-form-col{position:sticky;top:24px;margin-bottom:0}
+  .mric-calc .mric-stats-row{grid-template-columns:1fr 1fr 1fr}
+  .mric-calc .srow{grid-template-columns:repeat(3,1fr)}
+}
+
+/* Small screens */
+@media(max-width:360px){
+  .mric-calc .mric-form-grid{grid-template-columns:1fr}
+  .mric-calc .mric-hero h1{font-size:24px}
+  .mric-calc .stitle{font-size:22px}
+}
+</style>
+
+<div class="mric-calc">
+
+  <!-- ===== HERO ===== -->
+  <section class="mric-hero">
+    <div class="inn">
+      <img src="https://moneyradar.org/lp4/wp-content/themes/astra-child/assets/images/moneyradar-logo.webp" alt="MoneyRadar" class="mric-hero-logo">
+      <h1>Calculateur d'<em>Intérêts Composés</em></h1>
+      <p class="mric-hero-sub">Simulez la croissance de votre épargne grâce à l'effet boule de neige des intérêts composés. Entrez vos paramètres et visualisez l'évolution de votre capital année après année.</p>
+    </div>
+  </section>
+
+  <!-- ===== OUTIL : 2 COLONNES ===== -->
+  <section class="dk mric-tool-section">
+    <div class="inn-wide">
+      <div class="mric-tool-grid">
+
+        <!-- COL GAUCHE : Formulaire -->
+        <div class="mric-form-col">
+          <span class="lbl">Paramètres</span>
+          <div class="mric-form-grid">
+            <div class="mric-field">
+              <label for="mric-capital">Montant initial</label>
+              <div class="mric-input-wrap">
+                <input type="number" id="mric-capital" value="1000" min="0" step="100" inputmode="numeric">
+                <span class="mric-input-suffix">€</span>
+              </div>
+            </div>
+            <div class="mric-field">
+              <label for="mric-versement">Versement mensuel</label>
+              <div class="mric-input-wrap">
+                <input type="number" id="mric-versement" value="200" min="0" step="10" inputmode="numeric">
+                <span class="mric-input-suffix">€</span>
+              </div>
+            </div>
+            <div class="mric-field">
+              <label for="mric-taux">Taux annuel</label>
+              <div class="mric-input-wrap">
+                <input type="number" id="mric-taux" value="8" min="0" max="50" step="0.1" inputmode="decimal">
+                <span class="mric-input-suffix">%</span>
+              </div>
+            </div>
+            <div class="mric-field">
+              <label for="mric-duree">Durée</label>
+              <div class="mric-input-wrap">
+                <input type="number" id="mric-duree" value="20" min="1" max="100" step="1" inputmode="numeric">
+                <span class="mric-input-suffix">ans</span>
+              </div>
+            </div>
+          </div>
+          <button class="mric-btn" id="mric-btn-calculer" type="button">
+            Calculer
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </button>
+        </div>
+
+        <!-- COL DROITE : Résultats -->
+        <div class="mric-results-col">
+          <div class="mric-results" id="mric-results">
+
+            <!-- 3 stats -->
+            <div class="mric-stats-row">
+              <div class="mric-stat mric-primary mric-anim">
+                <div class="mric-stat-num" id="mric-capital-final">—</div>
+                <div class="mric-stat-lbl">Capital final</div>
+              </div>
+              <div class="mric-stat mric-anim mric-anim-d1">
+                <div class="mric-stat-num mric-white" id="mric-total-verse">—</div>
+                <div class="mric-stat-lbl">Total versé</div>
+              </div>
+              <div class="mric-stat mric-anim mric-anim-d2">
+                <div class="mric-stat-num" id="mric-interets">—</div>
+                <div class="mric-stat-lbl">Intérêts gagnés</div>
+              </div>
+            </div>
+
+            <!-- Bar -->
+            <div class="mric-bar-section mric-anim mric-anim-d2">
+              <div class="mric-bar-track">
+                <div class="mric-bar-fill mric-bar-v" id="mric-bar-v" style="width:0"><span class="mric-bar-pct" id="mric-pct-v"></span></div>
+                <div class="mric-bar-fill mric-bar-i" id="mric-bar-i" style="width:0"><span class="mric-bar-pct" id="mric-pct-i"></span></div>
+              </div>
+              <div class="mric-bar-legend">
+                <div class="mric-bar-legend-item"><span class="mric-ldot mric-ldot-v"></span><span>Versé</span> <strong id="mric-legend-v">—</strong></div>
+                <div class="mric-bar-legend-item"><span class="mric-ldot mric-ldot-i"></span><span>Intérêts</span> <strong id="mric-legend-i">—</strong></div>
+              </div>
+            </div>
+
+            <!-- Chart -->
+            <div class="mric-chart-wrap mric-anim mric-anim-d3">
+              <div class="mric-chart-header">
+                <span class="mric-chart-title">Croissance du capital</span>
+                <button class="mric-toggle" id="mric-toggle-table" type="button">
+                  <span>Tableau</span>
+                  <svg class="mric-chevron" width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+              </div>
+              <canvas id="mric-chart" height="180"></canvas>
+            </div>
+
+            <!-- Summary -->
+            <div class="qblock mric-anim mric-anim-d4" id="mric-summary"></div>
+
+            <!-- Lead Magnet — subtle inline CTA -->
+            <div class="mric-lm mric-anim mric-anim-d4">
+              <div class="mric-lm-head">
+                <div class="mric-lm-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+                <div class="mric-lm-title"><span>Cadeau :</span> votre masterclass investissement offerte</div>
+              </div>
+              <p class="mric-lm-desc">On vous offre <strong>45 min de formation avec un stratégiste macro</strong> pour comprendre les cycles économiques et prendre de meilleures décisions d'investissement. <strong style="color:var(--teal)">+ Le rapport Mégatendances 2026 en bonus.</strong></p>
+              <div class="mric-lm-row">
+                <script async src="https://subscribe-forms.beehiiv.com/embed.js"></script>
+                <iframe src="https://subscribe-forms.beehiiv.com/6b4ebcf6-43b1-46fd-86b1-aca466483c43" class="beehiiv-embed" data-test-id="beehiiv-embed" frameborder="0" scrolling="no" style="width:340px;height:47px;margin:0;border-radius:0;background-color:transparent;box-shadow:none;max-width:100%;"></iframe>
+              </div>
+              <p class="mric-lm-fine">100% gratuit · Vos données restent privées · Désabonnement en 1 clic</p>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Table full width below -->
+    <div class="mric-table-full">
+      <div class="mric-table-container" id="mric-table-container" style="max-width:1100px;margin:0 auto">
+        <div class="mric-table-scroll">
+          <table class="mric-table">
+            <thead><tr><th>Année</th><th>Versements cumulés</th><th>Intérêts cumulés</th><th>Capital total</th></tr></thead>
+            <tbody id="mric-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== ÉDUCATIF : DÉFINITION ===== -->
+  <section class="lt">
+    <div class="inn">
+      <h2 class="stitle">Qu'est-ce que les intérêts composés ?</h2>
+      <p class="btxt">Les intérêts composés sont souvent qualifiés de « huitième merveille du monde ». Contrairement aux intérêts simples (où seul le capital initial génère des rendements), les intérêts composés font travailler à la fois votre capital <strong>et</strong> les intérêts déjà accumulés.</p>
+      <p class="btxt">C'est ce mécanisme d'<strong>effet boule de neige</strong> qui explique pourquoi la croissance d'un investissement s'accélère avec le temps : lente au début, puis de plus en plus rapide à mesure que la base de capitalisation grossit.</p>
+    </div>
+  </section>
+
+  <!-- ===== FORMULE ===== -->
+  <section class="dk">
+    <div class="inn">
+      <h2 class="stitle">La formule des intérêts composés</h2>
+      <p class="btxt">Voici la formule utilisée par ce calculateur pour déterminer le capital final :</p>
+      <div class="mric-formula">
+        <p><strong>Capital final =</strong> Capital initial &times; (1 + i)<sup>n</sup> + Versement &times; [(1 + i)<sup>n</sup> &minus; 1] / i</p>
+        <ul>
+          <li><strong>i</strong> = taux mensuel = taux annuel / 12 / 100</li>
+          <li><strong>n</strong> = nombre de mois = durée en années &times; 12</li>
+        </ul>
+      </div>
+      <p class="btxt">Le premier terme représente la croissance du capital initial. Le second correspond à la valeur future de vos versements réguliers. Les deux grandissent de manière exponentielle grâce à la capitalisation mensuelle.</p>
+    </div>
+  </section>
+
+  <!-- ===== COMPARAISON ===== -->
+  <section class="lt">
+    <div class="inn">
+      <h2 class="stitle">Intérêts simples vs intérêts composés</h2>
+      <p class="btxt">Avec les <strong>intérêts simples</strong>, vous gagnez chaque année un pourcentage fixe de votre mise de départ. Avec les <strong>intérêts composés</strong>, les gains de chaque période s'ajoutent au capital et génèrent à leur tour des intérêts. Sur une longue durée, l'écart devient spectaculaire.</p>
+      <div class="srow">
+        <div class="scard"><div class="num">26 000 €</div><div class="lbl2">Intérêts simples<br>10k€ à 8% / 20 ans</div></div>
+        <div class="scard"><div class="num">46 610 €</div><div class="lbl2">Intérêts composés<br>10k€ à 8% / 20 ans</div></div>
+        <div class="scard"><div class="num">+79%</div><div class="lbl2">Écart de gains<br>grâce à la capitalisation</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== RÈGLE DE 72 ===== -->
+  <section class="dk">
+    <div class="inn">
+      <h2 class="stitle">La règle de 72 : doublez votre capital</h2>
+      <p class="btxt">La <strong>règle de 72</strong> est un raccourci mental pour estimer le temps nécessaire au doublement de votre capital. Il suffit de diviser 72 par votre taux de rendement annuel.</p>
+      <div class="mric-formula">
+        <p><strong>Temps pour doubler &asymp; 72 / taux annuel</strong></p>
+      </div>
+      <div class="cgrid">
+        <div class="card"><div class="cnum" style="color:#00F5C0;opacity:1">6%</div><div><h3>&asymp; 12 ans</h3><p>Rendement modéré type fonds diversifié</p></div></div>
+        <div class="card"><div class="cnum" style="color:#00F5C0;opacity:1">8%</div><div><h3>&asymp; 9 ans</h3><p>Rendement historique moyen des marchés actions</p></div></div>
+        <div class="card"><div class="cnum" style="color:#00F5C0;opacity:1">10%</div><div><h3>&asymp; 7 ans</h3><p>Rendement d'un portefeuille offensif actions</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== COÛT DE L'ATTENTE ===== -->
+  <section class="lt">
+    <div class="inn">
+      <h2 class="stitle">Le coût de l'attente : pourquoi commencer tôt change tout</h2>
+      <p class="btxt">L'un des facteurs les plus sous-estimés en investissement est le <strong>temps</strong>. Plus vous commencez tôt, plus l'effet boule de neige a le temps d'agir. Repousser le début de vos versements, ne serait-ce que de quelques années, peut représenter un manque à gagner considérable.</p>
+      <p class="btxt">Un investisseur qui place 200 €/mois à 8 % pendant 30 ans accumule un capital significativement plus élevé que celui qui attend 10 ans et verse ensuite la même somme pendant 20 ans, même si ce dernier investit un montant supérieur chaque mois pour « rattraper ». Le temps est l'allié le plus puissant des intérêts composés.</p>
+    </div>
+  </section>
+
+  <!-- ===== ENVELOPPES FISCALES ===== -->
+  <section class="dk">
+    <div class="inn">
+      <h2 class="stitle">Les enveloppes fiscales en France</h2>
+      <p class="btxt">En France, la fiscalité peut réduire considérablement vos gains nets. Heureusement, certaines enveloppes fiscales permettent de limiter l'impôt et de maximiser l'effet des intérêts composés.</p>
+      <div class="cgrid">
+        <div class="card">
+          <div class="cnum" style="color:#00F5C0;opacity:1">1</div>
+          <div>
+            <h3>PEA <span style="color:var(--teal)">(17,2 % après 5 ans)</span></h3>
+            <p>Après 5 ans, les plus-values sont exonérées d'impôt sur le revenu. Seuls les prélèvements sociaux de 17,2 % s'appliquent.</p>
+          </div>
+        </div>
+        <div class="card">
+          <div class="cnum" style="color:#00F5C0;opacity:1">2</div>
+          <div>
+            <h3>Assurance vie <span style="color:var(--teal)">(abattement après 8 ans)</span></h3>
+            <p>Après 8 ans, abattement annuel de 4 600 € (9 200 € en couple) sur les gains retirés. Taux réduit à 7,5 % + 17,2 % au-delà.</p>
+          </div>
+        </div>
+        <div class="card">
+          <div class="cnum" style="color:#00F5C0;opacity:1">3</div>
+          <div>
+            <h3>Compte-titres <span style="color:var(--teal)">(flat tax 30 %)</span></h3>
+            <p>Les gains sont soumis au Prélèvement Forfaitaire Unique (PFU) de 30 %, aussi appelé flat tax. Aucun avantage fiscal spécifique.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== EXCEL ===== -->
+  <section class="lt">
+    <div class="inn">
+      <h2 class="stitle">Simuler dans Excel ou Google Sheets</h2>
+      <p class="btxt">Vous pouvez reproduire ce calcul dans un tableur grâce à la fonction <strong>VC</strong> (Valeur Future) :</p>
+      <div class="mric-formula" style="background:var(--lt)">
+        <p><strong>=VC(taux/12 ; durée*12 ; -versement ; -capital ; 0)</strong></p>
+        <ul>
+          <li><strong>taux/12</strong> : taux d'intérêt mensuel</li>
+          <li><strong>durée*12</strong> : nombre total de mois</li>
+          <li><strong>-versement</strong> : versement mensuel (en négatif)</li>
+          <li><strong>-capital</strong> : capital initial (en négatif)</li>
+          <li><strong>0</strong> : versement en fin de période</li>
+        </ul>
+      </div>
+      <p class="btxt">En anglais (Google Sheets), utilisez <strong>=FV(rate/12, nper*12, -pmt, -pv, 0)</strong>.</p>
+    </div>
+  </section>
+
+  <!-- ===== FAQ ===== -->
+  <section class="dk">
+    <div class="inn">
+      <h2 class="stitle">Questions fréquentes</h2>
+      <div class="flist">
+        <details>
+          <summary>Comment sont calculés les intérêts composés ?</summary>
+          <div class="fans">Les intérêts composés sont calculés en appliquant le taux d'intérêt non seulement au capital initial, mais aussi aux intérêts déjà accumulés. À chaque période de capitalisation (mensuelle dans notre calculateur), les gains s'ajoutent au solde et deviennent productifs à leur tour.</div>
+        </details>
+        <details>
+          <summary>Quel est le meilleur taux pour les intérêts composés ?</summary>
+          <div class="fans">Le « meilleur taux » dépend de votre profil de risque. Historiquement, les marchés actions mondiaux ont offert un rendement moyen d'environ 7 à 10 % par an sur le long terme (avant inflation). Les livrets réglementés offrent des taux plus faibles mais sans risque de perte en capital.</div>
+        </details>
+        <details>
+          <summary>Quelle est la différence entre taux nominal et taux effectif ?</summary>
+          <div class="fans">Le taux nominal est le taux annoncé. Le taux effectif tient compte de la fréquence de capitalisation. Avec une capitalisation mensuelle, un taux nominal de 8 % correspond à un taux effectif d'environ 8,30 %. Plus la capitalisation est fréquente, plus le taux effectif est élevé.</div>
+        </details>
+        <details>
+          <summary>L'inflation réduit-elle mes intérêts composés ?</summary>
+          <div class="fans">Oui. L'inflation érode le pouvoir d'achat de votre capital futur. Si votre investissement rapporte 8 % par an et que l'inflation est de 2 %, votre rendement réel est d'environ 6 %. Il est important de raisonner en termes de rendement réel pour évaluer la véritable croissance de votre patrimoine.</div>
+        </details>
+        <details>
+          <summary>Combien de temps faut-il pour doubler mon argent ?</summary>
+          <div class="fans">Utilisez la règle de 72 : divisez 72 par votre taux annuel. À 6 %, il faut environ 12 ans. À 8 %, environ 9 ans. À 12 %, environ 6 ans. Cette estimation est d'autant plus précise que le taux est compris entre 4 % et 15 %.</div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- ===== JAVASCRIPT ===== -->
+<script>
+(function(){
+  'use strict';
+
+  var btnCalculer=document.getElementById('mric-btn-calculer');
+  var resultsSection=document.getElementById('mric-results');
+  var capitalFinalEl=document.getElementById('mric-capital-final');
+  var totalVerseEl=document.getElementById('mric-total-verse');
+  var interetsEl=document.getElementById('mric-interets');
+  var summaryEl=document.getElementById('mric-summary');
+  var tableBody=document.getElementById('mric-table-body');
+  var toggleBtn=document.getElementById('mric-toggle-table');
+  var tableContainer=document.getElementById('mric-table-container');
+  var barV=document.getElementById('mric-bar-v');
+  var barI=document.getElementById('mric-bar-i');
+  var pctV=document.getElementById('mric-pct-v');
+  var pctI=document.getElementById('mric-pct-i');
+  var legendV=document.getElementById('mric-legend-v');
+  var legendI=document.getElementById('mric-legend-i');
+  var chartCanvas=document.getElementById('mric-chart');
+
+  function formatEuro(n){
+    return n.toLocaleString('fr-FR',{style:'currency',currency:'EUR',minimumFractionDigits:2,maximumFractionDigits:2});
+  }
+  function formatCompact(n){
+    if(n>=1e6)return(n/1e6).toFixed(1).replace('.',',')+' M€';
+    if(n>=1e3)return(n/1e3).toFixed(0)+' k€';
+    return n.toFixed(0)+' €';
+  }
+
+  function drawChart(data){
+    var ctx=chartCanvas.getContext('2d');
+    var dpr=window.devicePixelRatio||1;
+    var rect=chartCanvas.getBoundingClientRect();
+    var h=180;
+    chartCanvas.width=rect.width*dpr;
+    chartCanvas.height=h*dpr;
+    ctx.scale(dpr,dpr);
+    var w=rect.width;
+    var pT=20,pB=28,pL=54,pR=14;
+    var pW=w-pL-pR,pH=h-pT-pB;
+    ctx.clearRect(0,0,w,h);
+    if(!data.length)return;
+
+    var max=data[data.length-1].solde;
+    var sX=pW/(data.length-1||1);
+
+    // Grid
+    ctx.strokeStyle='rgba(255,255,255,0.05)';ctx.lineWidth=1;
+    for(var g=0;g<=4;g++){
+      var gy=pT+(pH/4)*g;
+      ctx.beginPath();ctx.moveTo(pL,gy);ctx.lineTo(w-pR,gy);ctx.stroke();
+      ctx.fillStyle='rgba(155,179,208,0.45)';ctx.textAlign='right';ctx.textBaseline='middle';
+      ctx.font='11px sans-serif';
+      ctx.fillText(formatCompact(max-(max/4)*g),pL-8,gy);
+    }
+
+    // Versements area
+    ctx.beginPath();ctx.moveTo(pL,pT+pH);
+    for(var v=0;v<data.length;v++){ctx.lineTo(pL+v*sX,pT+pH-(data[v].versementsCumules/max)*pH)}
+    ctx.lineTo(pL+(data.length-1)*sX,pT+pH);ctx.closePath();
+    ctx.fillStyle='rgba(26,40,71,0.8)';ctx.fill();
+
+    // Total area
+    var grad=ctx.createLinearGradient(0,pT,0,pT+pH);
+    grad.addColorStop(0,'rgba(0,245,192,0.18)');grad.addColorStop(1,'rgba(0,245,192,0.01)');
+    ctx.beginPath();ctx.moveTo(pL,pT+pH);
+    for(var t=0;t<data.length;t++){ctx.lineTo(pL+t*sX,pT+pH-(data[t].solde/max)*pH)}
+    ctx.lineTo(pL+(data.length-1)*sX,pT+pH);ctx.closePath();
+    ctx.fillStyle=grad;ctx.fill();
+
+    // Total line
+    var lGrad=ctx.createLinearGradient(pL,0,w-pR,0);
+    lGrad.addColorStop(0,'#00F5C0');lGrad.addColorStop(1,'#1060C4');
+    ctx.beginPath();
+    for(var l=0;l<data.length;l++){
+      var lx=pL+l*sX,ly=pT+pH-(data[l].solde/max)*pH;
+      l===0?ctx.moveTo(lx,ly):ctx.lineTo(lx,ly);
+    }
+    ctx.strokeStyle=lGrad;ctx.lineWidth=2.5;ctx.lineJoin='round';ctx.stroke();
+
+    // Dots
+    var di=Math.max(1,Math.floor(data.length/8));
+    for(var d=0;d<data.length;d++){
+      if(d%di!==0&&d!==data.length-1)continue;
+      var dx=pL+d*sX,dy=pT+pH-(data[d].solde/max)*pH;
+      ctx.beginPath();ctx.arc(dx,dy,3.5,0,Math.PI*2);
+      ctx.fillStyle='#00F5C0';ctx.fill();
+      ctx.strokeStyle='rgba(0,245,192,0.2)';ctx.lineWidth=5;ctx.stroke();
+    }
+
+    // X labels
+    ctx.fillStyle='rgba(155,179,208,0.45)';ctx.textAlign='center';ctx.textBaseline='top';
+    ctx.font='10px sans-serif';
+    var xi=Math.max(1,Math.floor(data.length/6));
+    for(var x=0;x<data.length;x++){
+      if(x%xi!==0&&x!==data.length-1)continue;
+      ctx.fillText('An '+data[x].annee,pL+x*sX,h-pB+8);
+    }
+  }
+
+  function calculer(){
+    var K0=parseFloat(document.getElementById('mric-capital').value)||0;
+    var E=parseFloat(document.getElementById('mric-versement').value)||0;
+    var taux=parseFloat(document.getElementById('mric-taux').value)||0;
+    var duree=parseInt(document.getElementById('mric-duree').value,10)||0;
+    if(duree<=0)return;
+
+    var i=taux/12/100,n=duree*12;
+    var totalVerse=K0+(E*n);
+    var capitalFinal=i===0?K0+E*n:K0*Math.pow(1+i,n)+E*((Math.pow(1+i,n)-1)/i);
+    var interets=capitalFinal-totalVerse;
+
+    capitalFinalEl.textContent=formatEuro(capitalFinal);
+    totalVerseEl.textContent=formatEuro(totalVerse);
+    interetsEl.textContent=formatEuro(interets);
+    legendV.textContent=formatEuro(totalVerse);
+    legendI.textContent=formatEuro(interets);
+
+    var pV=capitalFinal>0?(totalVerse/capitalFinal*100):50;
+    var pI=capitalFinal>0?(interets/capitalFinal*100):50;
+    barV.style.width=pV.toFixed(1)+'%';
+    barI.style.width=pI.toFixed(1)+'%';
+    pctV.textContent=pV.toFixed(0)+'%';
+    pctI.textContent=pI.toFixed(0)+'%';
+
+    var pctGain=totalVerse>0?((interets/totalVerse)*100).toFixed(0):0;
+    summaryEl.innerHTML='En investissant <strong>'+formatEuro(K0)+'</strong> aujourd\'hui et en ajoutant <strong>'+formatEuro(E)+'</strong> chaque mois pendant <strong>'+duree+' an'+(duree>1?'s':'')+'</strong> à un taux de <strong>'+taux.toFixed(1).replace('.',',')+' %</strong>, votre capital atteindrait <strong>'+formatEuro(capitalFinal)+'</strong>. Les intérêts composés représentent <strong>'+formatEuro(interets)+'</strong>, soit <strong>'+pctGain+' %</strong> de plus que vos versements.';
+
+    tableBody.innerHTML='';
+    var solde=K0,yearlyData=[];
+    for(var a=1;a<=duree;a++){
+      var vc=K0+E*a*12;
+      for(var m=0;m<12;m++){solde=solde*(1+i)+E}
+      var ic=solde-vc;
+      yearlyData.push({annee:a,versementsCumules:vc,interetsCumules:ic,solde:solde});
+      var tr=document.createElement('tr');
+      tr.innerHTML='<td>'+a+'</td><td>'+formatEuro(vc)+'</td><td>'+formatEuro(ic)+'</td><td>'+formatEuro(solde)+'</td>';
+      tableBody.appendChild(tr);
+    }
+
+    resultsSection.classList.add('mric-visible');
+
+    var anims=resultsSection.querySelectorAll('.mric-anim');
+    anims.forEach(function(el){el.style.animation='none';el.offsetHeight;el.style.animation=''});
+
+    setTimeout(function(){drawChart(yearlyData)},250);
+  }
+
+  toggleBtn.addEventListener('click',function(){
+    var open=tableContainer.style.display==='block';
+    tableContainer.style.display=open?'none':'block';
+    toggleBtn.classList.toggle('mric-open',!open);
+    toggleBtn.querySelector('span').textContent=open?'Masquer':'Tableau';
+  });
+
+  var resizeTimer;
+  window.addEventListener('resize',function(){
+    clearTimeout(resizeTimer);
+    resizeTimer=setTimeout(function(){if(resultsSection.classList.contains('mric-visible'))calculer()},200);
+  });
+
+  // Scroll reveal for educational sections
+  var sectionObserver=new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if(entry.isIntersecting){entry.target.classList.add('mric-visible')}
+    });
+  },{threshold:0.15,rootMargin:'0px 0px -40px 0px'});
+  document.querySelectorAll('.mric-calc section').forEach(function(s){sectionObserver.observe(s)});
+
+  btnCalculer.addEventListener('click',calculer);
+  calculer();
+})();
+</script>
