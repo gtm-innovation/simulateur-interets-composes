@@ -1,0 +1,1133 @@
+<!-- Calculateur Inflation vs Investissement v2 — MoneyRadar -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+/* ===== CALCULATEUR INFLATION VS INVESTISSEMENT v2 ===== */
+.mric-calc {
+  --teal:#00F5C0;--teal-dim:rgba(0,245,192,0.08);--teal-b:rgba(0,245,192,0.3);
+  --blue:#1060C4;
+  --navy:#0B1120;--navy2:#131F35;--navy3:#1A2847;
+  --light:#F4F7FF;--light2:#EAF0FF;
+  --lt:#1A2847;--lsub:#4A5D7A;--lborder:#D0DCEF;
+  --dsub:#C5D5E8;--dborder:rgba(255,255,255,0.07);
+  --green:#00F5C0;--red:#FF3B4E;
+  --pattern-svg:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2300F5C0' fill-opacity='0.07'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  --glass:rgba(255,255,255,0.03);
+  --glass-border:rgba(255,255,255,0.08);
+  --surface:rgba(255,255,255,0.025);
+  width:100%;max-width:100%;box-sizing:border-box;overflow-x:hidden;
+}
+.mric-calc *,.mric-calc *::before,.mric-calc *::after{box-sizing:border-box}
+
+/* ===== HERO — identique ===== */
+.mric-calc .mric-hero{text-align:center;position:relative;overflow:hidden;background-image:var(--pattern-svg),radial-gradient(ellipse 75% 50% at 50% 0%,rgba(0,245,192,.28) 0%,rgba(0,245,192,.10) 40%,rgba(0,245,192,.02) 65%,transparent 80%);background-color:var(--navy)}
+.mric-calc .mric-hero>*{position:relative;z-index:1}
+.mric-calc .mric-hero-logo{display:block;margin:0 auto 28px;height:32px;width:auto;opacity:.85}
+@keyframes mric-shimmer{0%{background-position:0% center}100%{background-position:200% center}}
+.mric-calc .mric-hero .inn{max-width:760px;margin:0 auto;padding:60px 24px 50px}
+.mric-calc .mric-hero h1{font-size:clamp(30px,4.5vw,52px);font-weight:800;line-height:1.1;letter-spacing:-.03em;max-width:700px;margin:0 auto 20px;color:#EFF4FF}
+.mric-calc .mric-hero h1 em{font-style:normal;color:var(--teal)}
+.mric-calc .mric-hero-sub{font-size:clamp(15px,1.7vw,17px);color:#fff;max-width:560px;margin:0 auto;font-weight:400}
+
+/* ===== LAYOUT — single column, form on top ===== */
+.mric-calc .mric-main{background:var(--navy);position:relative;min-height:100vh}
+.mric-calc .mric-main::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:
+  radial-gradient(ellipse 600px 400px at 10% 20%, rgba(0,245,192,0.03) 0%, transparent 70%),
+  radial-gradient(ellipse 500px 300px at 90% 80%, rgba(16,96,196,0.04) 0%, transparent 70%);
+  pointer-events:none}
+.mric-calc .mric-main>*{position:relative;z-index:1}
+
+.mric-calc .mric-container{max-width:880px;margin:0 auto;padding:0 24px 60px}
+
+/* ===== FORM — horizontal strip ===== */
+.mric-calc .mric-form-strip{
+  padding:28px 28px 24px;
+  background:rgba(255,255,255,0.03);
+  border:1px solid var(--glass-border);
+  border-radius:16px;
+  margin-bottom:40px;
+}
+.mric-calc .mric-form-strip .mric-form-label{
+  font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;
+  color:var(--teal);margin-bottom:18px;display:block;
+}
+.mric-calc .mric-form-strip .mric-form-label::before{content:'— ';opacity:.5}
+.mric-calc .mric-form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.mric-calc .mric-field label{display:block;font-size:11px;font-weight:700;color:#fff;margin-bottom:8px;letter-spacing:.04em;text-transform:uppercase}
+.mric-calc .mric-input-wrap{position:relative}
+.mric-calc .mric-input-wrap input{
+  width:100%;padding:14px 44px 14px 16px;
+  border:1px solid rgba(255,255,255,0.10);border-radius:10px;
+  background:rgba(11,17,32,0.8);color:#EFF4FF;
+  transition:all .25s cubic-bezier(.4,0,.2,1);
+  box-sizing:border-box;-moz-appearance:textfield;font-size:16px;font-weight:600;
+}
+.mric-calc .mric-input-wrap input::-webkit-outer-spin-button,
+.mric-calc .mric-input-wrap input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.mric-calc .mric-input-wrap input:focus{
+  outline:none;border-color:var(--teal);
+  box-shadow:0 0 0 3px rgba(0,245,192,.1), 0 0 24px rgba(0,245,192,.06);
+  background:rgba(11,17,32,0.95);
+}
+.mric-calc .mric-input-suffix{position:absolute;right:16px;top:50%;transform:translateY(-50%);color:#fff;pointer-events:none;font-weight:600;font-size:13px}
+
+.mric-calc .mric-btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:10px;
+  font-size:15px;font-weight:700;padding:16px 24px;border-radius:10px;
+  text-decoration:none;transition:all .3s cubic-bezier(.4,0,.2,1);
+  letter-spacing:.02em;border:none;cursor:pointer;width:100%;color:#0B1120;
+  background:var(--teal);
+  box-shadow:0 4px 24px rgba(0,245,192,0.25), inset 0 1px 0 rgba(255,255,255,0.2);
+  position:relative;overflow:hidden;
+}
+.mric-calc .mric-btn::before{
+  content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.15),transparent);
+  transition:left .5s ease;
+}
+.mric-calc .mric-btn:hover{transform:translateY(-2px);box-shadow:0 8px 40px rgba(0,245,192,0.35), inset 0 1px 0 rgba(255,255,255,0.2)}
+.mric-calc .mric-btn:hover::before{left:100%}
+.mric-calc .mric-btn:active{transform:translateY(0)}
+.mric-calc .mric-btn svg{flex-shrink:0}
+
+/* ===== RESULTS ===== */
+.mric-calc .mric-results{display:none}
+.mric-calc .mric-results.mric-visible{display:block}
+
+/* --- Hero number: écart --- */
+.mric-calc .mric-hero-result{
+  text-align:center;padding:0 0 44px;margin-bottom:40px;
+  border-bottom:1px solid rgba(255,255,255,0.06);
+}
+.mric-calc .mric-hero-result-label{
+  font-size:12px;font-weight:600;color:#fff;
+  letter-spacing:.08em;text-transform:uppercase;margin-bottom:14px;
+}
+.mric-calc .mric-hero-result-num{
+  font-size:clamp(40px,6vw,64px);font-weight:800;color:var(--teal);
+  line-height:1;letter-spacing:-0.03em;margin-bottom:10px;
+}
+.mric-calc .mric-hero-result-sub{
+  font-size:15px;color:#fff;line-height:1.4;max-width:460px;margin:0 auto;
+}
+
+/* --- Versus layout: two columns --- */
+.mric-calc .mric-versus{
+  display:grid;grid-template-columns:1fr 1fr;gap:0;
+  margin-bottom:40px;border-radius:16px;overflow:hidden;
+  border:1px solid rgba(255,255,255,0.06);
+}
+.mric-calc .mric-vs-panel{padding:28px 24px 24px;position:relative;text-align:center}
+.mric-calc .mric-vs-panel.mric-vs-loss{
+  background:linear-gradient(180deg,rgba(255,59,78,0.06) 0%,rgba(255,59,78,0.01) 100%);
+  border-right:1px solid rgba(255,255,255,0.06);
+}
+.mric-calc .mric-vs-panel.mric-vs-gain{
+  background:linear-gradient(180deg,rgba(0,245,192,0.06) 0%,rgba(0,245,192,0.01) 100%);
+}
+.mric-calc .mric-vs-tag{
+  font-size:clamp(16px,2vw,20px);font-weight:800;letter-spacing:-0.01em;
+  margin-bottom:20px;
+}
+.mric-calc .mric-vs-loss .mric-vs-tag{color:var(--red)}
+.mric-calc .mric-vs-gain .mric-vs-tag{color:var(--teal)}
+
+.mric-calc .mric-vs-stat{margin-bottom:20px}
+.mric-calc .mric-vs-stat:last-child{margin-bottom:0}
+.mric-calc .mric-vs-num{
+  font-size:clamp(22px,3vw,30px);font-weight:800;line-height:1.1;
+  margin-bottom:4px;letter-spacing:-0.01em;
+}
+.mric-calc .mric-vs-loss .mric-vs-num{color:var(--red)}
+.mric-calc .mric-vs-gain .mric-vs-num{color:var(--teal)}
+.mric-calc .mric-vs-lbl{font-size:13px;color:#EFF4FF;font-weight:500}
+
+/* Separator "VS" circle */
+.mric-calc .mric-versus-sep{
+  position:absolute;top:50%;left:100%;transform:translate(-50%,-50%);z-index:2;
+  width:36px;height:36px;border-radius:50%;
+  background:var(--navy);border:1px solid rgba(255,255,255,0.1);
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:800;color:#fff;letter-spacing:.05em;
+}
+
+/* --- Bar chart --- */
+.mric-calc .mric-bar-section{margin-bottom:40px}
+.mric-calc .mric-bar-heading{
+  font-size:13px;font-weight:700;color:#EFF4FF;margin-bottom:14px;
+}
+.mric-calc .mric-bar-track{
+  display:flex;height:56px;
+  background:rgba(11,17,32,0.6);border-radius:12px;overflow:hidden;
+  border:1px solid var(--glass-border);
+  box-shadow:inset 0 2px 6px rgba(0,0,0,0.2);
+}
+.mric-calc .mric-bar-fill{height:100%;display:flex;align-items:center;justify-content:center;transition:width .8s cubic-bezier(.34,1.56,.64,1);overflow:hidden;min-width:0}
+.mric-calc .mric-bar-v{background:linear-gradient(90deg,#3A1520,#5A2535)}
+.mric-calc .mric-bar-i{background:linear-gradient(90deg,var(--teal),var(--blue));box-shadow:0 0 20px rgba(0,245,192,0.2)}
+.mric-calc .mric-bar-pct{color:#fff;font-weight:800;font-size:16px;white-space:nowrap;padding:0 12px;letter-spacing:.01em;text-shadow:0 1px 3px rgba(0,0,0,0.4)}
+.mric-calc .mric-bar-legend{display:flex;gap:24px;margin-top:12px;flex-wrap:wrap}
+.mric-calc .mric-bar-legend-item{display:flex;align-items:center;gap:7px;font-size:13px;color:#fff}
+.mric-calc .mric-bar-legend-item strong{color:#EFF4FF;font-weight:800;font-size:15px}
+.mric-calc .mric-ldot{width:10px;height:10px;border-radius:3px;flex-shrink:0}
+.mric-calc .mric-ldot-v{background:#5A2535}
+.mric-calc .mric-ldot-i{background:var(--teal);box-shadow:0 0 6px rgba(0,245,192,0.4)}
+
+/* --- Chart --- */
+.mric-calc .mric-chart-section{margin-bottom:40px}
+.mric-calc .mric-chart-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.mric-calc .mric-chart-title{font-weight:700;font-size:13px;color:#EFF4FF}
+.mric-calc #mric-chart{
+  width:100%;border-radius:14px;
+  border:1px solid var(--glass-border);
+  background:rgba(11,17,32,0.5);
+  box-shadow:0 4px 24px rgba(0,0,0,0.15);
+}
+
+/* Toggle */
+.mric-calc .mric-toggle{
+  display:inline-flex;align-items:center;gap:6px;padding:8px 16px;
+  background:rgba(255,255,255,0.03);border:1px solid var(--glass-border);
+  border-radius:8px;color:#EFF4FF;cursor:pointer;transition:all .25s;font-weight:600;font-size:12px;
+}
+.mric-calc .mric-toggle:hover{border-color:rgba(0,245,192,0.2);color:var(--teal);background:rgba(0,245,192,.04)}
+.mric-calc .mric-chevron{transition:transform .3s}
+.mric-calc .mric-toggle.mric-open .mric-chevron{transform:rotate(180deg)}
+
+/* Table */
+.mric-calc .mric-table-container{display:none;margin-top:14px}
+.mric-calc .mric-table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.mric-calc .mric-table{width:100%;border-collapse:collapse;border-radius:12px;overflow:hidden}
+.mric-calc .mric-table thead{background:rgba(11,17,32,0.8)}
+.mric-calc .mric-table th{padding:14px 16px;text-align:right;color:#fff;font-weight:700;white-space:nowrap;font-size:10px;letter-spacing:.12em;text-transform:uppercase;border-bottom:1px solid var(--glass-border)}
+.mric-calc .mric-table th:first-child{text-align:center}
+.mric-calc .mric-table td{padding:12px 16px;text-align:right;white-space:nowrap;font-size:13px;border-bottom:1px solid rgba(255,255,255,0.04);color:#fff;font-weight:500}
+.mric-calc .mric-table td:first-child{text-align:center;font-weight:700;color:#EFF4FF}
+.mric-calc .mric-table td:last-child{font-weight:700;color:var(--teal)}
+.mric-calc .mric-table tbody tr{transition:all .2s}
+.mric-calc .mric-table tbody tr:hover{background:rgba(0,245,192,.03)}
+.mric-calc .mric-table td.mric-td-red{color:var(--red);font-weight:600}
+
+/* --- Summary block --- */
+.mric-calc .mric-summary{
+  border-left:3px solid var(--teal);padding:20px 24px;
+  border-radius:0 14px 14px 0;margin-bottom:36px;
+  font-size:14px;font-weight:400;line-height:1.75;
+  background:rgba(0,245,192,0.03);color:#EFF4FF;
+  border:1px solid rgba(0,245,192,0.06);border-left:3px solid var(--teal);
+}
+.mric-calc .mric-summary strong{font-weight:700;color:#EFF4FF}
+
+/* ===== CTA Lead Magnet ===== */
+.mric-calc .mric-lm{
+  position:relative;overflow:hidden;
+  padding:32px 0 28px;margin-bottom:24px;
+  border-top:1px solid rgba(255,255,255,0.06);
+}
+@keyframes mric-float{0%,100%{transform:translate(0,0)}50%{transform:translate(-10px,10px)}}
+
+.mric-calc .mric-lm-head{position:relative;z-index:1;display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.mric-calc .mric-lm-icon{
+  width:36px;height:36px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  overflow:hidden;
+}
+.mric-calc .mric-lm-icon img{width:100%;height:100%;object-fit:cover;border-radius:10px}
+.mric-calc .mric-lm-title{font-size:15px;font-weight:700;color:#EFF4FF;line-height:1.3}
+.mric-calc .mric-lm-title span{color:var(--teal)}
+.mric-calc .mric-lm-desc{position:relative;z-index:1;font-size:13px;line-height:1.6;color:#fff;margin-bottom:16px}
+.mric-calc .mric-lm-desc strong{color:#EFF4FF;font-weight:600}
+.mric-calc .mric-lm-row{position:relative;z-index:1;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.mric-calc .mric-lm-row iframe{max-width:100%}
+.mric-calc .mric-lm-fine{font-size:10px;color:#fff;margin-top:12px;position:relative;z-index:1;letter-spacing:.02em}
+
+/* ===== Guides internes ===== */
+.mric-calc .mric-guides{padding:28px 0 0;border-top:1px solid rgba(255,255,255,0.06);overflow:hidden}
+.mric-calc .mric-guides-head{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.mric-calc .mric-guides-logo{height:18px;width:auto}
+.mric-calc .mric-guides-title{font-size:13px;font-weight:700;color:#EFF4FF;letter-spacing:.01em}
+.mric-calc .mric-guides-grid{display:grid;grid-template-columns:1fr;gap:6px}
+.mric-calc .mric-guide-link{display:flex;align-items:center;gap:12px;padding:10px 0;text-decoration:none;transition:all .2s ease}
+.mric-calc .mric-guide-link:hover .mric-guide-txt strong{color:var(--teal)}
+.mric-calc .mric-guide-icon{flex-shrink:0;width:20px;height:20px;color:var(--teal)}
+.mric-calc .mric-guide-txt{display:flex;flex-direction:column;gap:1px;flex:1;min-width:0}
+.mric-calc .mric-guide-txt strong{font-size:13px;font-weight:600;color:#EFF4FF;line-height:1.3}
+.mric-calc .mric-guide-txt span{font-size:11px;color:#EFF4FF}
+.mric-calc .mric-guide-link svg.mric-guide-chevron{flex-shrink:0;color:#EFF4FF;opacity:.3;transition:all .2s}
+.mric-calc .mric-guide-link:hover svg.mric-guide-chevron{opacity:.6;transform:translateX(2px)}
+
+/* ===== Nos autres calculateurs ===== */
+.mric-calc .mric-othercalc{
+  margin-top:28px;padding:20px;border-radius:14px;
+  background:rgba(0,245,192,0.04);border:1px solid rgba(0,245,192,0.10);
+  position:relative;overflow:hidden;
+}
+.mric-calc .mric-othercalc::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--teal),var(--blue));
+}
+.mric-calc .mric-othercalc-title{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--teal);margin-bottom:14px}
+.mric-calc .mric-othercalc-grid{display:grid;grid-template-columns:1fr;gap:0}
+.mric-calc .mric-othercalc-item{
+  display:flex;align-items:center;gap:12px;padding:10px 0;
+  text-decoration:none;transition:all .2s ease;
+  border-bottom:1px solid rgba(0,245,192,0.06);
+}
+.mric-calc .mric-othercalc-item:last-child{border-bottom:none;padding-bottom:0}
+.mric-calc .mric-othercalc-item:first-child{padding-top:0}
+.mric-calc .mric-othercalc-item:hover .mric-othercalc-name{color:var(--teal)}
+.mric-calc .mric-othercalc-name{font-size:13px;font-weight:600;color:#EFF4FF;flex:1;line-height:1.3;transition:color .2s}
+.mric-calc .mric-othercalc-desc{font-size:11px;color:rgba(210,225,240,0.85);display:none}
+.mric-calc .mric-othercalc-item svg{flex-shrink:0;width:14px;height:14px;color:rgba(210,225,240,0.7);transition:all .2s}
+.mric-calc .mric-othercalc-item:hover svg{color:var(--teal);transform:translateX(2px)}
+@media(min-width:640px){
+  .mric-calc .mric-othercalc-grid{grid-template-columns:1fr 1fr 1fr;gap:0}
+  .mric-calc .mric-othercalc-item{border-bottom:none;padding:0 12px;border-right:1px solid rgba(0,245,192,0.08)}
+  .mric-calc .mric-othercalc-item:last-child{border-right:none;padding-right:0}
+  .mric-calc .mric-othercalc-item:first-child{padding-left:0}
+  .mric-calc .mric-othercalc-desc{display:block}
+}
+
+/* ===== Educational sections ===== */
+.mric-calc .mric-section{padding:72px 24px;position:relative}
+.mric-calc .mric-section-inner{max-width:760px;margin:0 auto}
+.mric-calc .mric-section.mric-lt{background:var(--light);color:var(--lt)}
+.mric-calc .mric-section.mric-dk{background:var(--navy);color:#EFF4FF}
+.mric-calc .mric-section.mric-dk::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:
+  radial-gradient(ellipse 600px 400px at 10% 20%, rgba(0,245,192,0.03) 0%, transparent 70%),
+  radial-gradient(ellipse 500px 300px at 90% 80%, rgba(16,96,196,0.04) 0%, transparent 70%);
+  pointer-events:none}
+.mric-calc .mric-section.mric-dk>*{position:relative;z-index:1}
+
+.mric-calc .mric-section .stitle{
+  font-size:clamp(26px,3.5vw,40px);font-weight:800;margin-bottom:20px;line-height:1.15;letter-spacing:-0.02em;
+}
+.mric-calc .mric-dk .stitle{color:#fff}
+.mric-calc .mric-section .btxt{font-size:16px;margin-bottom:18px;line-height:1.75}
+.mric-calc .mric-dk .btxt{color:#fff}
+.mric-calc .mric-lt .btxt{color:#1A2847}
+.mric-calc .mric-section .btxt strong{color:#EFF4FF}
+.mric-calc .mric-lt .btxt strong{color:var(--lt)}
+
+/* Impact numbers — horizontal ticker style */
+.mric-calc .mric-ticker{
+  display:flex;gap:0;margin:36px 0 0;overflow-x:auto;-webkit-overflow-scrolling:touch;
+}
+.mric-calc .mric-ticker-item{
+  flex:1;min-width:0;padding:24px 0;text-align:center;
+  border-right:1px solid rgba(255,255,255,0.06);
+}
+.mric-calc .mric-ticker-item:last-child{border-right:none}
+.mric-calc .mric-ticker-num{font-size:clamp(26px,3.5vw,42px);font-weight:800;color:var(--red);line-height:1;margin-bottom:6px}
+.mric-calc .mric-ticker-lbl{font-size:12px;color:#fff;font-weight:500}
+.mric-calc .mric-ticker-lbl span{color:var(--red);font-weight:700}
+
+/* Formula */
+.mric-calc .mric-formula{
+  position:relative;background:var(--lt);
+  border:1px solid var(--lt);border-radius:14px;
+  padding:28px 28px;margin:24px 0;overflow:hidden;
+}
+.mric-calc .mric-formula::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--teal),var(--blue),var(--teal));
+  background-size:200% auto;animation:mric-shimmer 4s linear infinite;
+}
+.mric-calc .mric-formula p{color:#fff;margin:0 0 8px;line-height:1.6;font-weight:500}
+.mric-calc .mric-formula ul{padding-left:20px;margin:10px 0 0;list-style:none}
+.mric-calc .mric-formula li{color:#fff;margin-bottom:4px;font-size:14px;padding-left:16px;position:relative;line-height:1.5}
+.mric-calc .mric-formula li::before{content:'\2192';position:absolute;left:0;top:0;color:var(--teal);opacity:.5;font-size:12px}
+.mric-calc .mric-formula li strong{color:#EFF4FF}
+
+/* Protection steps — timeline style */
+.mric-calc .mric-timeline{margin:36px 0 0;position:relative;padding-left:28px}
+.mric-calc .mric-timeline::before{
+  content:'';position:absolute;left:11px;top:8px;bottom:8px;width:2px;
+  background:linear-gradient(180deg,var(--teal),rgba(0,245,192,0.1));border-radius:2px;
+}
+.mric-calc .mric-tl-item{position:relative;padding:0 0 32px 20px}
+.mric-calc .mric-tl-item:last-child{padding-bottom:0}
+.mric-calc .mric-tl-dot{
+  position:absolute;left:-22px;top:6px;width:14px;height:14px;
+  border-radius:50%;background:var(--navy);border:2px solid var(--teal);
+  box-shadow:0 0 10px rgba(0,245,192,0.3);
+}
+.mric-calc .mric-tl-item h3{font-size:17px;font-weight:700;color:#EFF4FF;margin:0 0 6px}
+.mric-calc .mric-tl-item h3 span{color:var(--teal)}
+.mric-calc .mric-tl-item p{font-size:14px;color:#fff;margin:0;line-height:1.65}
+
+/* Errors — bold callout style */
+.mric-calc .mric-errlist{margin:28px 0;display:grid;gap:0}
+.mric-calc .mric-err{display:flex;gap:14px;align-items:flex-start;padding:20px 0;border-bottom:1px solid var(--lborder)}
+.mric-calc .mric-err:last-child{border-bottom:none}
+.mric-calc .mric-err-x{
+  flex-shrink:0;width:28px;height:28px;border-radius:8px;
+  background:rgba(255,59,78,0.08);
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;font-weight:800;color:var(--red);margin-top:1px;
+}
+.mric-calc .mric-err strong{font-size:16px;font-weight:700;color:var(--lt);display:block;margin-bottom:4px}
+.mric-calc .mric-err p{font-size:14px;margin:0;line-height:1.65;color:#1A2847}
+
+/* FAQ */
+.mric-calc .flist{margin:24px 0;display:grid;gap:8px}
+.mric-calc .flist details{border-radius:12px;overflow:hidden;transition:all .3s}
+.mric-calc .mric-dk .flist details{background:rgba(255,255,255,0.02);border:1px solid var(--glass-border)}
+.mric-calc .mric-dk .flist details:hover{border-color:rgba(0,245,192,0.1)}
+.mric-calc .mric-dk .flist details[open]{border-color:rgba(0,245,192,0.12);box-shadow:0 0 30px rgba(0,245,192,0.04)}
+.mric-calc .flist summary{padding:20px 24px;cursor:pointer;font-weight:700;font-size:16px;display:flex;justify-content:space-between;align-items:center;list-style:none;transition:color .2s;color:#EFF4FF}
+.mric-calc .flist summary::-webkit-details-marker{display:none}
+.mric-calc .flist summary::after{
+  content:'+';font-size:20px;font-weight:400;color:var(--teal);
+  transition:all .3s cubic-bezier(.4,0,.2,1);flex-shrink:0;margin-left:16px;
+  width:28px;height:28px;display:flex;align-items:center;justify-content:center;
+  border-radius:8px;background:rgba(0,245,192,0.06);
+}
+.mric-calc .flist details[open] summary::after{transform:rotate(45deg);background:rgba(0,245,192,0.12)}
+.mric-calc .flist .fans{padding:0 24px 22px;font-size:15px;line-height:1.75;color:#fff}
+
+/* ===== Share buttons ===== */
+.mric-calc .mric-share{padding:24px 0;border-top:1px solid rgba(255,255,255,0.06);margin-bottom:8px}
+.mric-calc .mric-share-lbl{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--teal);margin-bottom:14px}
+.mric-calc .mric-share-row{display:flex;gap:10px;flex-wrap:wrap}
+.mric-calc .mric-share-btn{
+  width:40px;height:40px;border-radius:10px;border:1px solid rgba(255,255,255,0.10);
+  background:rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:all .25s cubic-bezier(.4,0,.2,1);position:relative;color:#fff;padding:0;
+}
+.mric-calc .mric-share-btn:hover{
+  border-color:rgba(0,245,192,0.3);color:var(--teal);background:rgba(0,245,192,0.08);
+  box-shadow:0 0 20px rgba(0,245,192,0.1);transform:translateY(-2px);
+}
+.mric-calc .mric-share-btn svg{width:18px;height:18px;fill:currentColor}
+.mric-calc .mric-share-btn--copy{width:auto;padding:0 16px;gap:8px;font-size:12px;font-weight:600}
+.mric-calc .mric-share-btn--copy svg{width:16px;height:16px}
+.mric-calc .mric-share-toast{
+  position:absolute;bottom:-28px;left:50%;transform:translateX(-50%);
+  font-size:11px;font-weight:600;color:var(--teal);white-space:nowrap;
+  opacity:0;transition:opacity .3s;pointer-events:none;
+}
+.mric-calc .mric-share-toast.mric-show{opacity:1}
+.mric-calc .mric-share-native{
+  display:none;width:auto;padding:0 20px;gap:8px;
+  font-size:13px;font-weight:700;color:#fff;
+  background:rgba(0,245,192,0.12);border:1px solid rgba(0,245,192,0.25);
+}
+.mric-calc .mric-share-native:hover{background:rgba(0,245,192,0.2)}
+@media(max-width:600px){
+  .mric-calc .mric-share-native.mric-has-api{display:flex}
+  .mric-calc .mric-share-row.mric-has-native{display:none}
+}
+
+/* ===== Animations ===== */
+@keyframes mric-fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.mric-calc .mric-anim{animation:mric-fadeUp .5s cubic-bezier(.16,1,.3,1) forwards;opacity:0}
+.mric-calc .mric-anim-d1{animation-delay:.1s}
+.mric-calc .mric-anim-d2{animation-delay:.2s}
+.mric-calc .mric-anim-d3{animation-delay:.3s}
+.mric-calc .mric-anim-d4{animation-delay:.4s}
+
+/* Scroll reveal for educational sections */
+.mric-calc .mric-section .mric-section-inner>*{
+  opacity:0;transform:translateY(16px);
+  transition:opacity .6s cubic-bezier(.16,1,.3,1), transform .6s cubic-bezier(.16,1,.3,1);
+}
+.mric-calc .mric-section.mric-visible .mric-section-inner>*{opacity:1;transform:translateY(0)}
+.mric-calc .mric-section.mric-visible .mric-section-inner>*:nth-child(2){transition-delay:.08s}
+.mric-calc .mric-section.mric-visible .mric-section-inner>*:nth-child(3){transition-delay:.16s}
+.mric-calc .mric-section.mric-visible .mric-section-inner>*:nth-child(4){transition-delay:.24s}
+.mric-calc .mric-section.mric-visible .mric-section-inner>*:nth-child(5){transition-delay:.32s}
+
+/* ===== RESPONSIVE ===== */
+@media(min-width:641px){
+  .mric-calc .mric-form-row{grid-template-columns:1fr 1fr 1fr 1fr}
+  .mric-calc .mric-form-row+.mric-btn{max-width:260px}
+  .mric-calc .mric-guides-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:640px){
+  .mric-calc .mric-versus{grid-template-columns:1fr}
+  .mric-calc .mric-vs-panel.mric-vs-loss{border-right:none;border-bottom:1px solid rgba(255,255,255,0.06)}
+  .mric-calc .mric-versus-sep{display:none}
+  .mric-calc .mric-ticker{flex-direction:column}
+  .mric-calc .mric-ticker-item{border-right:none;border-bottom:1px solid rgba(255,255,255,0.06);padding:16px 0;text-align:left}
+  .mric-calc .mric-ticker-item:last-child{border-bottom:none}
+}
+@media(max-width:360px){
+  .mric-calc .mric-form-row{grid-template-columns:1fr}
+  .mric-calc .mric-hero h1{font-size:24px}
+}
+</style>
+
+<div class="mric-calc" data-share-url="https://moneyradar.org/simulateur-inflation-vs-investissement/">
+
+  <!-- ===== HERO — identique ===== -->
+  <section class="mric-hero">
+    <div class="inn">
+      <img src="https://moneyradar.org/lp4/wp-content/themes/astra-child/assets/images/moneyradar-logo.webp" alt="MoneyRadar" class="mric-hero-logo">
+      <h1>Inflation vs Investissement :<br><em>combien perdez-vous vraiment&nbsp;?</em></h1>
+      <p class="mric-hero-sub">Comparez ce que devient votre épargne si vous ne faites rien face à l'inflation, ou si vous la placez. La différence est souvent plus grande qu'on ne le croit.</p>
+    </div>
+  </section>
+
+  <!-- ===== OUTIL — single column layout ===== -->
+  <div class="mric-main">
+    <div class="mric-container">
+
+      <!-- Formulaire horizontal -->
+      <div class="mric-form-strip">
+        <span class="mric-form-label">Paramètres</span>
+        <div class="mric-form-row">
+          <div class="mric-field">
+            <label for="mric-capital">Montant initial</label>
+            <div class="mric-input-wrap">
+              <input type="number" id="mric-capital" value="10000" min="0" step="1000" inputmode="numeric">
+              <span class="mric-input-suffix">&euro;</span>
+            </div>
+          </div>
+          <div class="mric-field">
+            <label for="mric-duree">Durée</label>
+            <div class="mric-input-wrap">
+              <input type="number" id="mric-duree" value="20" min="1" max="100" step="1" inputmode="numeric">
+              <span class="mric-input-suffix">ans</span>
+            </div>
+          </div>
+          <div class="mric-field">
+            <label for="mric-inflation">Inflation annuelle</label>
+            <div class="mric-input-wrap">
+              <input type="number" id="mric-inflation" value="3" min="0" max="50" step="0.1" inputmode="decimal">
+              <span class="mric-input-suffix">%</span>
+            </div>
+          </div>
+          <div class="mric-field">
+            <label for="mric-rendement">Rendement annuel</label>
+            <div class="mric-input-wrap">
+              <input type="number" id="mric-rendement" value="8" min="0" max="50" step="0.1" inputmode="decimal">
+              <span class="mric-input-suffix">%</span>
+            </div>
+          </div>
+        </div>
+        <button class="mric-btn" id="mric-btn-calculer" type="button">
+          Comparer
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+      </div>
+
+      <!-- RÉSULTATS -->
+      <div class="mric-results" id="mric-results">
+
+        <!-- Chiffre clé — hero -->
+        <div class="mric-hero-result mric-anim">
+          <div class="mric-hero-result-label">Écart entre ne rien faire et investir</div>
+          <div class="mric-hero-result-num" id="mric-ecart">—</div>
+          <div class="mric-hero-result-sub" id="mric-ecart-sub"></div>
+        </div>
+
+        <!-- Versus panels -->
+        <div class="mric-versus mric-anim mric-anim-d1">
+          <div class="mric-vs-panel mric-vs-loss">
+            <div class="mric-versus-sep">VS</div>
+            <div class="mric-vs-tag">Sans investissement</div>
+            <div class="mric-vs-stat">
+              <div class="mric-vs-num" id="mric-val-infl">—</div>
+              <div class="mric-vs-lbl">Pouvoir d'achat réel</div>
+            </div>
+            <div class="mric-vs-stat">
+              <div class="mric-vs-num" id="mric-perte-infl">—</div>
+              <div class="mric-vs-lbl">Perte de pouvoir d'achat</div>
+            </div>
+          </div>
+          <div class="mric-vs-panel mric-vs-gain">
+            <div class="mric-vs-tag">Avec investissement</div>
+            <div class="mric-vs-stat">
+              <div class="mric-vs-num" id="mric-val-inv">—</div>
+              <div class="mric-vs-lbl">Capital final (nominal)</div>
+            </div>
+            <div class="mric-vs-stat">
+              <div class="mric-vs-num" id="mric-val-inv-reel">—</div>
+              <div class="mric-vs-lbl">Valeur réelle après inflation</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bar -->
+        <div class="mric-bar-section mric-anim mric-anim-d2">
+          <div class="mric-bar-heading">Comparaison visuelle</div>
+          <div class="mric-bar-track">
+            <div class="mric-bar-fill mric-bar-v" id="mric-bar-v" style="width:0"><span class="mric-bar-pct" id="mric-pct-v"></span></div>
+            <div class="mric-bar-fill mric-bar-i" id="mric-bar-i" style="width:0"><span class="mric-bar-pct" id="mric-pct-i"></span></div>
+          </div>
+          <div class="mric-bar-legend">
+            <div class="mric-bar-legend-item"><span class="mric-ldot mric-ldot-v"></span><span>Sans investissement</span> <strong id="mric-legend-v">—</strong></div>
+            <div class="mric-bar-legend-item"><span class="mric-ldot mric-ldot-i"></span><span>Avec investissement (réel)</span> <strong id="mric-legend-i">—</strong></div>
+          </div>
+        </div>
+
+        <!-- Chart -->
+        <div class="mric-chart-section mric-anim mric-anim-d3">
+          <div class="mric-chart-header">
+            <span class="mric-chart-title">Évolution comparée</span>
+            <button class="mric-toggle" id="mric-toggle-table" type="button">
+              <span>Tableau</span>
+              <svg class="mric-chevron" width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+          </div>
+          <canvas id="mric-chart" height="220"></canvas>
+          <div class="mric-table-container" id="mric-table-container">
+            <div class="mric-table-scroll">
+              <table class="mric-table">
+                <thead><tr><th>Année</th><th>Sans investissement</th><th>Perte inflation</th><th>Capital investi</th><th>Valeur réelle</th></tr></thead>
+                <tbody id="mric-table-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Summary -->
+        <div class="mric-summary mric-anim mric-anim-d4" id="mric-summary"></div>
+
+        <!-- Share buttons -->
+        <div class="mric-share mric-anim mric-anim-d4" id="mric-share">
+          <div class="mric-share-lbl">Partager ce simulateur</div>
+          <button class="mric-share-btn mric-share-native" id="mric-share-native" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="fill:none"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+            Partager
+          </button>
+          <div class="mric-share-row" id="mric-share-row">
+            <button class="mric-share-btn mric-share-btn--copy" data-platform="copy" type="button" title="Copier le lien">
+              <svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+              Copier
+              <span class="mric-share-toast" id="mric-toast">Copié !</span>
+            </button>
+            <button class="mric-share-btn" data-platform="twitter" type="button" title="Partager sur X / Twitter">
+              <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            </button>
+            <button class="mric-share-btn" data-platform="facebook" type="button" title="Partager sur Facebook">
+              <svg viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+            </button>
+            <button class="mric-share-btn" data-platform="whatsapp" type="button" title="Partager sur WhatsApp">
+              <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            </button>
+            <button class="mric-share-btn" data-platform="linkedin" type="button" title="Partager sur LinkedIn">
+              <svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+            </button>
+            <button class="mric-share-btn" data-platform="telegram" type="button" title="Partager sur Telegram">
+              <svg viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 000 12a12 12 0 0012 12 12 12 0 0012-12A12 12 0 0012 0a12 12 0 00-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 01.171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+            </button>
+            <button class="mric-share-btn" data-platform="email" type="button" title="Envoyer par email">
+              <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Lead Magnet CTA -->
+        <div class="mric-lm mric-anim mric-anim-d4">
+          <div class="mric-lm-head">
+            <div class="mric-lm-icon"><img src="https://moneyradar.org/wp-content/uploads/2026/03/Capture-decran-2026-03-06-a-11.01.24.png" alt="Masterclass investissement"></div>
+            <div class="mric-lm-title"><span>Cadeau :</span> votre masterclass investissement offerte</div>
+          </div>
+          <p class="mric-lm-desc">On vous offre <strong>45 min de formation avec un stratégiste macro</strong> pour comprendre les cycles économiques et prendre de meilleures décisions d'investissement. <strong style="color:var(--teal)">+ Le rapport Mégatendances 2026 en bonus.</strong></p>
+          <div class="mric-lm-row">
+            <script async src="https://subscribe-forms.beehiiv.com/embed.js"></script>
+            <iframe src="https://subscribe-forms.beehiiv.com/6b4ebcf6-43b1-46fd-86b1-aca466483c43" class="beehiiv-embed" data-test-id="beehiiv-embed" frameborder="0" scrolling="no" style="width:340px;height:47px;margin:0;border-radius:0;background-color:transparent;box-shadow:none;max-width:100%;"></iframe>
+          </div>
+          <p class="mric-lm-fine">100% gratuit · Vos données restent privées · Désabonnement en 1 clic</p>
+        </div>
+
+        <!-- Guides -->
+        <div class="mric-guides mric-anim mric-anim-d4">
+          <div class="mric-guides-head"><img src="https://moneyradar.org/lp4/wp-content/themes/astra-child/assets/images/moneyradar-logo.webp" alt="MoneyRadar" class="mric-guides-logo"><div class="mric-guides-title">Nos guides pour bien investir</div></div>
+          <div class="mric-guides-grid">
+            <a href="https://moneyradar.org/bourse/pea/meilleur-pea/" class="mric-guide-link" target="_blank" rel="noopener">
+              <svg class="mric-guide-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+              <span class="mric-guide-txt"><strong>Meilleur PEA</strong><span>Comparatif des meilleurs PEA</span></span>
+              <svg class="mric-guide-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </a>
+            <a href="https://moneyradar.org/assurance-vie/meilleure-assurance-vie/" class="mric-guide-link" target="_blank" rel="noopener">
+              <svg class="mric-guide-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              <span class="mric-guide-txt"><strong>Meilleure assurance vie</strong><span>Comparatif des meilleurs contrats</span></span>
+              <svg class="mric-guide-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </a>
+            <a href="https://moneyradar.org/dans-quoi-investir/" class="mric-guide-link" target="_blank" rel="noopener">
+              <svg class="mric-guide-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+              <span class="mric-guide-txt"><strong>Dans quoi investir</strong><span>Guide complet pour placer son argent</span></span>
+              <svg class="mric-guide-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </a>
+            <a href="https://moneyradar.org/bourse/meilleur-broker/" class="mric-guide-link" target="_blank" rel="noopener">
+              <svg class="mric-guide-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+              <span class="mric-guide-txt"><strong>Meilleur broker</strong><span>Comparatif des meilleurs courtiers</span></span>
+              <svg class="mric-guide-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </a>
+            <a href="https://moneyradar.org/bourse/compte-titres/" class="mric-guide-link" target="_blank" rel="noopener">
+              <svg class="mric-guide-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+              <span class="mric-guide-txt"><strong>Meilleur compte-titres</strong><span>Comparatif des meilleurs CTO</span></span>
+              <svg class="mric-guide-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </a>
+            <a href="https://moneyradar.org/guides/dca/" class="mric-guide-link" target="_blank" rel="noopener">
+              <svg class="mric-guide-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+              <span class="mric-guide-txt"><strong>Le DCA expliqué</strong><span>La stratégie des versements réguliers</span></span>
+              <svg class="mric-guide-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <!-- Nos autres calculateurs -->
+        <div class="mric-othercalc mric-anim mric-anim-d4">
+          <div class="mric-othercalc-title">Nos autres calculateurs</div>
+          <div class="mric-othercalc-grid">
+            <a href="https://moneyradar.org/guides/interets-composes/" class="mric-othercalc-item">
+              <div>
+                <div class="mric-othercalc-name">Intérêts Composés</div>
+                <div class="mric-othercalc-desc">Simulez la croissance de votre épargne</div>
+              </div>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </a>
+            <a href="https://moneyradar.org/simulateur-objectif-financier/" class="mric-othercalc-item">
+              <div>
+                <div class="mric-othercalc-name">Objectif Financier</div>
+                <div class="mric-othercalc-desc">Calculez votre épargne mensuelle idéale</div>
+              </div>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </a>
+            <a href="https://moneyradar.org/simulateur-liberte-financiere/" class="mric-othercalc-item">
+              <div>
+                <div class="mric-othercalc-name">Liberté Financière</div>
+                <div class="mric-othercalc-desc">Quand pourrez-vous vivre de vos placements</div>
+              </div>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== ÉDUCATIF : DÉFINITION ===== -->
+  <section class="mric-section mric-lt">
+    <div class="mric-section-inner">
+      <h2 class="stitle">Comment l'inflation érode votre épargne</h2>
+      <p class="btxt">L'inflation est la hausse générale des prix au fil du temps. Si votre argent ne génère aucun rendement, il perd progressivement de sa valeur. Ce qui coûte 100 € aujourd'hui coûtera plus cher dans 10 ou 20 ans. Votre épargne, elle, restera au même montant nominal, mais achètera de moins en moins.</p>
+      <p class="btxt">C'est ce qu'on appelle la <strong>perte de pouvoir d'achat</strong>. Elle est silencieuse mais redoutable sur le long terme. Avec une inflation moyenne de 3 % par an, un billet de 10 000 € perd environ un quart de sa valeur réelle en seulement 10 ans.</p>
+    </div>
+  </section>
+
+  <!-- ===== CHIFFRES CLÉS ===== -->
+  <section class="mric-section mric-dk">
+    <div class="mric-section-inner">
+      <h2 class="stitle">L'impact concret de l'inflation</h2>
+      <p class="btxt">Voici ce que deviennent <strong>10 000 €</strong> laissés sur un compte courant (sans rendement) avec une inflation de 3 % par an :</p>
+      <div class="mric-ticker">
+        <div class="mric-ticker-item">
+          <div class="mric-ticker-num">7 441 €</div>
+          <div class="mric-ticker-lbl">après 10 ans · <span>-25 %</span></div>
+        </div>
+        <div class="mric-ticker-item">
+          <div class="mric-ticker-num">5 537 €</div>
+          <div class="mric-ticker-lbl">après 20 ans · <span>-45 %</span></div>
+        </div>
+        <div class="mric-ticker-item">
+          <div class="mric-ticker-num">4 120 €</div>
+          <div class="mric-ticker-lbl">après 30 ans · <span>-59 %</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FORMULES ===== -->
+  <section class="mric-section mric-lt">
+    <div class="mric-section-inner">
+      <h2 class="stitle">Les formules utilisées</h2>
+      <p class="btxt">Ce simulateur compare deux scénarios à partir des mêmes données de départ :</p>
+      <div class="mric-formula">
+        <p><strong>Scénario 1 : sans investissement</strong></p>
+        <p>Valeur réelle = Montant initial / (1 + inflation)<sup>durée</sup></p>
+        <ul>
+          <li><strong>Perte</strong> = Montant initial &minus; Valeur réelle</li>
+        </ul>
+      </div>
+      <div class="mric-formula">
+        <p><strong>Scénario 2 : avec investissement</strong></p>
+        <p>Capital nominal = Montant initial &times; (1 + rendement)<sup>durée</sup></p>
+        <ul>
+          <li><strong>Valeur réelle</strong> = Capital nominal / (1 + inflation)<sup>durée</sup></li>
+          <li><strong>Gain réel</strong> = Valeur réelle &minus; Montant initial</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== SE PROTÉGER — timeline ===== -->
+  <section class="mric-section mric-dk">
+    <div class="mric-section-inner">
+      <h2 class="stitle">Comment protéger votre épargne de l'inflation</h2>
+      <p class="btxt">Ne rien faire est la pire des stratégies face à l'inflation. Voici les principaux leviers pour préserver et faire croître votre pouvoir d'achat :</p>
+      <div class="mric-timeline">
+        <div class="mric-tl-item">
+          <div class="mric-tl-dot"></div>
+          <h3>Investir en bourse <span>(ETF, actions)</span></h3>
+          <p>Historiquement, les marchés actions offrent un rendement moyen de 7 à 10 % par an sur le long terme, bien au-dessus de l'inflation.</p>
+        </div>
+        <div class="mric-tl-item">
+          <div class="mric-tl-dot"></div>
+          <h3>L'assurance vie en unités de compte</h3>
+          <p>Permet de diversifier entre fonds euros (sécurité) et unités de compte (performance) avec un cadre fiscal avantageux après 8 ans.</p>
+        </div>
+        <div class="mric-tl-item">
+          <div class="mric-tl-dot"></div>
+          <h3>L'immobilier <span>(SCPI, locatif)</span></h3>
+          <p>Les loyers et la valeur des biens tendent à suivre l'inflation, offrant une protection naturelle contre l'érosion monétaire.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== ERREURS COURANTES ===== -->
+  <section class="mric-section mric-lt">
+    <div class="mric-section-inner">
+      <h2 class="stitle">Les erreurs les plus courantes face à l'inflation</h2>
+      <p class="btxt">Beaucoup d'épargnants pensent protéger leur argent en le laissant sur un livret ou un compte courant. En réalité, ils perdent du pouvoir d'achat chaque année sans s'en rendre compte.</p>
+      <div class="mric-errlist">
+        <div class="mric-err">
+          <div class="mric-err-x">✗</div>
+          <div>
+            <strong>Laisser dormir son argent sur un compte courant</strong>
+            <p>Rendement : 0 %. Votre argent perd de la valeur chaque jour. C'est exactement ce que mesure notre simulateur.</p>
+          </div>
+        </div>
+        <div class="mric-err">
+          <div class="mric-err-x">✗</div>
+          <div>
+            <strong>Se contenter du Livret A</strong>
+            <p>Le Livret A offre un taux souvent inférieur à l'inflation. Vous perdez moins vite, mais vous perdez quand même en pouvoir d'achat réel.</p>
+          </div>
+        </div>
+        <div class="mric-err">
+          <div class="mric-err-x">✗</div>
+          <div>
+            <strong>Attendre le « bon moment » pour investir</strong>
+            <p>Chaque année d'attente est une année de perte face à l'inflation. Le meilleur moment pour commencer, c'est le plus tôt possible.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FAQ ===== -->
+  <section class="mric-section mric-dk">
+    <div class="mric-section-inner">
+      <h2 class="stitle">Questions fréquentes</h2>
+      <div class="flist">
+        <details>
+          <summary>Comment l'inflation fait-elle perdre de l'argent ?</summary>
+          <div class="fans">L'inflation augmente le prix des biens et services. Si votre argent ne génère pas de rendement, il achète de moins en moins au fil du temps. Avec 3 % d'inflation par an, 10 000 € d'aujourd'hui n'auront plus que l'équivalent de 7 441 € de pouvoir d'achat dans 10 ans.</div>
+        </details>
+        <details>
+          <summary>Quel rendement faut-il pour battre l'inflation ?</summary>
+          <div class="fans">Il faut au minimum un rendement supérieur au taux d'inflation. Si l'inflation est de 3 %, un placement à 3 % maintient votre pouvoir d'achat mais ne le fait pas croître. Un rendement de 7-8 % (typique des marchés actions sur le long terme) permet de réellement gagner en pouvoir d'achat.</div>
+        </details>
+        <details>
+          <summary>Le Livret A protège-t-il de l'inflation ?</summary>
+          <div class="fans">Pas toujours. Le taux du Livret A est fixé par les pouvoirs publics et n'est pas systématiquement supérieur à l'inflation. En période de forte inflation, le Livret A peut offrir un rendement réel négatif, ce qui signifie que vous perdez du pouvoir d'achat malgré les intérêts perçus.</div>
+        </details>
+        <details>
+          <summary>Quelle est l'inflation moyenne en France ?</summary>
+          <div class="fans">Sur les 20 dernières années, l'inflation en France a oscillé entre 0,5 % et 6 %. La moyenne historique long terme se situe autour de 2 à 3 % par an. La BCE cible un taux d'inflation de 2 % à moyen terme pour la zone euro.</div>
+        </details>
+        <details>
+          <summary>Ce simulateur tient-il compte des impôts ?</summary>
+          <div class="fans">Non, ce simulateur montre les rendements bruts avant fiscalité. En France, les gains d'investissement sont soumis au PFU de 30 % (flat tax) ou au barème progressif. Les enveloppes fiscales comme le PEA ou l'assurance vie permettent de réduire cet impact.</div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- ===== JAVASCRIPT ===== -->
+<script>
+(function(){
+  'use strict';
+
+  var btnCalculer=document.getElementById('mric-btn-calculer');
+  var resultsSection=document.getElementById('mric-results');
+
+  // Stat elements
+  var valInflEl=document.getElementById('mric-val-infl');
+  var perteInflEl=document.getElementById('mric-perte-infl');
+  var valInvEl=document.getElementById('mric-val-inv');
+  var valInvReelEl=document.getElementById('mric-val-inv-reel');
+  var ecartEl=document.getElementById('mric-ecart');
+  var ecartSubEl=document.getElementById('mric-ecart-sub');
+  var summaryEl=document.getElementById('mric-summary');
+  var tableBody=document.getElementById('mric-table-body');
+  var toggleBtn=document.getElementById('mric-toggle-table');
+  var tableContainer=document.getElementById('mric-table-container');
+
+  // Bar
+  var barV=document.getElementById('mric-bar-v');
+  var barI=document.getElementById('mric-bar-i');
+  var pctV=document.getElementById('mric-pct-v');
+  var pctI=document.getElementById('mric-pct-i');
+  var legendV=document.getElementById('mric-legend-v');
+  var legendI=document.getElementById('mric-legend-i');
+
+  var chartCanvas=document.getElementById('mric-chart');
+
+  function formatEuro(n){
+    return n.toLocaleString('fr-FR',{style:'currency',currency:'EUR',minimumFractionDigits:0,maximumFractionDigits:0});
+  }
+  function formatCompact(n){
+    if(n>=1e6)return(n/1e6).toFixed(1).replace('.',',')+' M\u20AC';
+    if(n>=1e3)return(n/1e3).toFixed(0)+' k\u20AC';
+    return n.toFixed(0)+' \u20AC';
+  }
+  function formatPct(n){return n.toFixed(1).replace('.',',')+' %'}
+
+  function drawChart(data){
+    var ctx=chartCanvas.getContext('2d');
+    var dpr=window.devicePixelRatio||1;
+    var rect=chartCanvas.getBoundingClientRect();
+    var h=220;
+    chartCanvas.width=rect.width*dpr;
+    chartCanvas.height=h*dpr;
+    ctx.scale(dpr,dpr);
+    var w=rect.width;
+    var pT=20,pB=28,pL=54,pR=14;
+    var pW=w-pL-pR,pH=h-pT-pB;
+    ctx.clearRect(0,0,w,h);
+    if(!data.length)return;
+
+    var max=0;
+    for(var m=0;m<data.length;m++){
+      if(data[m].capitalInvesti>max)max=data[m].capitalInvesti;
+      if(data[m].montantInitial>max)max=data[m].montantInitial;
+    }
+    max=max*1.05;
+    var sX=pW/(data.length-1||1);
+
+    ctx.strokeStyle='rgba(255,255,255,0.05)';ctx.lineWidth=1;
+    for(var g=0;g<=4;g++){
+      var gy=pT+(pH/4)*g;
+      ctx.beginPath();ctx.moveTo(pL,gy);ctx.lineTo(w-pR,gy);ctx.stroke();
+      ctx.fillStyle='#fff';ctx.textAlign='right';ctx.textBaseline='middle';
+      ctx.font='11px sans-serif';
+      ctx.fillText(formatCompact(max-(max/4)*g),pL-8,gy);
+    }
+
+    var initY=pT+pH-(data[0].montantInitial/max)*pH;
+    ctx.setLineDash([4,4]);
+    ctx.strokeStyle='rgba(197,213,232,0.25)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(pL,initY);ctx.lineTo(w-pR,initY);ctx.stroke();
+    ctx.setLineDash([]);
+
+    ctx.beginPath();ctx.moveTo(pL,initY);
+    for(var r=0;r<data.length;r++){
+      ctx.lineTo(pL+r*sX,pT+pH-(data[r].valeurReelleInfl/max)*pH);
+    }
+    ctx.lineTo(pL+(data.length-1)*sX,initY);ctx.closePath();
+    ctx.fillStyle='rgba(255,59,78,0.08)';ctx.fill();
+
+    var grad=ctx.createLinearGradient(0,pT,0,pT+pH);
+    grad.addColorStop(0,'rgba(0,245,192,0.15)');grad.addColorStop(1,'rgba(0,245,192,0.01)');
+    ctx.beginPath();ctx.moveTo(pL,initY);
+    for(var t=0;t<data.length;t++){
+      ctx.lineTo(pL+t*sX,pT+pH-(data[t].capitalInvesti/max)*pH);
+    }
+    ctx.lineTo(pL+(data.length-1)*sX,initY);ctx.closePath();
+    ctx.fillStyle=grad;ctx.fill();
+
+    ctx.beginPath();
+    for(var a=0;a<data.length;a++){
+      var ax=pL+a*sX,ay=pT+pH-(data[a].valeurReelleInfl/max)*pH;
+      a===0?ctx.moveTo(ax,ay):ctx.lineTo(ax,ay);
+    }
+    ctx.strokeStyle='#FF3B4E';ctx.lineWidth=2;ctx.lineJoin='round';ctx.stroke();
+
+    ctx.beginPath();
+    for(var b=0;b<data.length;b++){
+      var bx=pL+b*sX,by=pT+pH-(data[b].valeurReelleInv/max)*pH;
+      b===0?ctx.moveTo(bx,by):ctx.lineTo(bx,by);
+    }
+    ctx.strokeStyle='#00F5C0';ctx.lineWidth=2;ctx.lineJoin='round';ctx.stroke();
+
+    ctx.setLineDash([5,3]);
+    ctx.beginPath();
+    for(var c=0;c<data.length;c++){
+      var cx=pL+c*sX,cy=pT+pH-(data[c].capitalInvesti/max)*pH;
+      c===0?ctx.moveTo(cx,cy):ctx.lineTo(cx,cy);
+    }
+    ctx.strokeStyle='rgba(16,96,196,0.5)';ctx.lineWidth=1.5;ctx.stroke();
+    ctx.setLineDash([]);
+
+    var di=Math.max(1,Math.floor(data.length/8));
+    for(var d=0;d<data.length;d++){
+      if(d%di!==0&&d!==data.length-1)continue;
+      var rdx=pL+d*sX,rdy=pT+pH-(data[d].valeurReelleInfl/max)*pH;
+      ctx.beginPath();ctx.arc(rdx,rdy,3,0,Math.PI*2);
+      ctx.fillStyle='#FF3B4E';ctx.fill();
+      var gdx=pL+d*sX,gdy=pT+pH-(data[d].valeurReelleInv/max)*pH;
+      ctx.beginPath();ctx.arc(gdx,gdy,3,0,Math.PI*2);
+      ctx.fillStyle='#00F5C0';ctx.fill();
+    }
+
+    ctx.fillStyle='#fff';ctx.textAlign='center';ctx.textBaseline='top';
+    ctx.font='10px sans-serif';
+    var xi=Math.max(1,Math.floor(data.length/6));
+    for(var x=0;x<data.length;x++){
+      if(x%xi!==0&&x!==data.length-1)continue;
+      ctx.fillText('An '+data[x].annee,pL+x*sX,h-pB+8);
+    }
+
+    ctx.font='10px sans-serif';
+    var legY=pT+6;
+    ctx.fillStyle='#FF3B4E';ctx.fillRect(pL+8,legY,10,3);
+    ctx.fillStyle='#fff';ctx.textAlign='left';
+    ctx.fillText('Sans investissement',pL+22,legY+5);
+    ctx.fillStyle='#00F5C0';ctx.fillRect(pL+8,legY+14,10,3);
+    ctx.fillStyle='#fff';
+    ctx.fillText('Investi (réel)',pL+22,legY+19);
+  }
+
+  function calculer(){
+    var K0=parseFloat(document.getElementById('mric-capital').value)||0;
+    var infl=parseFloat(document.getElementById('mric-inflation').value)||0;
+    var rend=parseFloat(document.getElementById('mric-rendement').value)||0;
+    var duree=parseInt(document.getElementById('mric-duree').value,10)||0;
+    if(duree<=0||K0<=0)return;
+
+    var inflRate=infl/100;
+    var rendRate=rend/100;
+
+    var valReelleInfl=K0/Math.pow(1+inflRate,duree);
+    var perteInfl=K0-valReelleInfl;
+    var pertePct=(perteInfl/K0)*100;
+
+    var capitalInvesti=K0*Math.pow(1+rendRate,duree);
+    var valReelleInv=capitalInvesti/Math.pow(1+inflRate,duree);
+    var gainNominal=capitalInvesti-K0;
+    var gainReel=valReelleInv-K0;
+
+    var ecart=valReelleInv-valReelleInfl;
+
+    valInflEl.textContent=formatEuro(valReelleInfl);
+    perteInflEl.textContent='- '+formatEuro(perteInfl)+' ('+formatPct(pertePct)+')';
+    valInvEl.textContent=formatEuro(capitalInvesti);
+    valInvReelEl.textContent=formatEuro(valReelleInv);
+    ecartEl.textContent='+ '+formatEuro(ecart);
+    ecartSubEl.textContent='en investissant plutôt qu\'en laissant dormir votre argent';
+
+    var total=valReelleInfl+valReelleInv;
+    var pSans=total>0?(valReelleInfl/total*100):50;
+    var pAvec=total>0?(valReelleInv/total*100):50;
+    barV.style.width=pSans.toFixed(1)+'%';
+    barI.style.width=pAvec.toFixed(1)+'%';
+    pctV.textContent=formatEuro(valReelleInfl);
+    pctI.textContent=formatEuro(valReelleInv);
+    legendV.textContent=formatEuro(valReelleInfl);
+    legendI.textContent=formatEuro(valReelleInv);
+
+    summaryEl.innerHTML='En laissant <strong>'+formatEuro(K0)+'</strong> dormir pendant <strong>'+duree+' an'+(duree>1?'s':'')+'</strong> avec une inflation de <strong>'+formatPct(infl)+'</strong>, votre épargne ne vaudrait plus que <strong>'+formatEuro(valReelleInfl)+'</strong> en pouvoir d\'achat réel, soit une perte de <strong>'+formatEuro(perteInfl)+'</strong>. En investissant à <strong>'+formatPct(rend)+'</strong> par an, votre capital atteindrait <strong>'+formatEuro(capitalInvesti)+'</strong> (soit <strong>'+formatEuro(valReelleInv)+'</strong> en valeur réelle). <strong style="color:#00F5C0">La différence : '+formatEuro(ecart)+'.</strong>';
+
+    tableBody.innerHTML='';
+    var yearlyData=[];
+    for(var a=1;a<=duree;a++){
+      var vri=K0/Math.pow(1+inflRate,a);
+      var ci=K0*Math.pow(1+rendRate,a);
+      var vri2=ci/Math.pow(1+inflRate,a);
+      yearlyData.push({annee:a,montantInitial:K0,valeurReelleInfl:vri,capitalInvesti:ci,valeurReelleInv:vri2});
+      var tr=document.createElement('tr');
+      tr.innerHTML='<td>'+a+'</td><td class="mric-td-red">'+formatEuro(vri)+'</td><td class="mric-td-red">- '+formatEuro(K0-vri)+'</td><td>'+formatEuro(ci)+'</td><td style="color:#00F5C0;font-weight:700">'+formatEuro(vri2)+'</td>';
+      tableBody.appendChild(tr);
+    }
+
+    resultsSection.classList.add('mric-visible');
+
+    var anims=resultsSection.querySelectorAll('.mric-anim');
+    anims.forEach(function(el){el.style.animation='none';el.offsetHeight;el.style.animation=''});
+
+    setTimeout(function(){drawChart(yearlyData)},250);
+  }
+
+  // ===== Share buttons =====
+  var SHARE_URL=document.querySelector('.mric-calc').getAttribute('data-share-url')||window.location.href;
+  var SHARE_TITLE="Simulateur Inflation vs Investissement — MoneyRadar";
+  var SHARE_TEXT="Découvrez combien vous perdez face à l'inflation si vous n'investissez pas, avec ce simulateur gratuit :";
+
+  function copyLink(){
+    var toast=document.getElementById('mric-toast');
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(SHARE_URL).then(function(){showToast(toast)}).catch(function(){fallbackCopy(toast)});
+    }else{fallbackCopy(toast)}
+  }
+  function fallbackCopy(toast){
+    var ta=document.createElement('textarea');ta.value=SHARE_URL;ta.style.position='fixed';ta.style.opacity='0';
+    document.body.appendChild(ta);ta.select();
+    try{document.execCommand('copy');showToast(toast)}catch(e){}
+    document.body.removeChild(ta);
+  }
+  function showToast(toast){
+    toast.classList.add('mric-show');
+    setTimeout(function(){toast.classList.remove('mric-show')},2000);
+  }
+
+  function shareTo(platform){
+    var u=encodeURIComponent(SHARE_URL);
+    var t=encodeURIComponent(SHARE_TEXT+' '+SHARE_URL);
+    var urls={
+      twitter:'https://twitter.com/intent/tweet?url='+u+'&text='+encodeURIComponent(SHARE_TEXT),
+      facebook:'https://www.facebook.com/sharer/sharer.php?u='+u,
+      whatsapp:'https://wa.me/?text='+t,
+      linkedin:'https://www.linkedin.com/sharing/share-offsite/?url='+u,
+      telegram:'https://t.me/share/url?url='+u+'&text='+encodeURIComponent(SHARE_TEXT),
+      email:'mailto:?subject='+encodeURIComponent(SHARE_TITLE)+'&body='+t
+    };
+    if(urls[platform]){
+      if(platform==='email'){window.location.href=urls[platform]}
+      else{window.open(urls[platform],'_blank','noopener,width=600,height=500')}
+    }
+  }
+
+  function nativeShare(){
+    if(navigator.share){
+      navigator.share({title:SHARE_TITLE,text:SHARE_TEXT,url:SHARE_URL}).catch(function(){});
+    }
+  }
+
+  var nativeBtn=document.getElementById('mric-share-native');
+  var shareRow=document.getElementById('mric-share-row');
+  if(navigator.share){
+    nativeBtn.classList.add('mric-has-api');
+    shareRow.classList.add('mric-has-native');
+  }
+
+  nativeBtn.addEventListener('click',nativeShare);
+  document.querySelectorAll('.mric-share-btn[data-platform]').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      var p=this.getAttribute('data-platform');
+      if(p==='copy'){copyLink()}else{shareTo(p)}
+    });
+  });
+
+  toggleBtn.addEventListener('click',function(){
+    var open=tableContainer.style.display==='block';
+    tableContainer.style.display=open?'none':'block';
+    toggleBtn.classList.toggle('mric-open',!open);
+    toggleBtn.querySelector('span').textContent=open?'Tableau':'Masquer';
+  });
+
+  var resizeTimer;
+  window.addEventListener('resize',function(){
+    clearTimeout(resizeTimer);
+    resizeTimer=setTimeout(function(){if(resultsSection.classList.contains('mric-visible'))calculer()},200);
+  });
+
+  var sectionObserver=new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if(entry.isIntersecting){entry.target.classList.add('mric-visible')}
+    });
+  },{threshold:0.15,rootMargin:'0px 0px -40px 0px'});
+  document.querySelectorAll('.mric-calc .mric-section').forEach(function(s){sectionObserver.observe(s)});
+
+  btnCalculer.addEventListener('click',calculer);
+  calculer();
+})();
+</script>
