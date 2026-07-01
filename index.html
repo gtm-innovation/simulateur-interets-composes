@@ -1503,7 +1503,7 @@
           <div class="mric-form-grid">
             <div class="mric-field"><label for="mric-capital">Capital de départ</label><div class="mric-input-wrap"><input type="number" id="mric-capital" value="1000" min="0" step="100" inputmode="numeric"><span class="mric-input-suffix">&euro;</span></div></div>
             <div class="mric-field"><label for="mric-versement">Versement mensuel</label><div class="mric-input-wrap"><input type="number" id="mric-versement" value="200" min="0" step="10" inputmode="numeric"><span class="mric-input-suffix">&euro;</span></div></div>
-            <div class="mric-field"><label for="mric-taux">Rendement annuel</label><div class="mric-input-wrap"><input type="number" id="mric-taux" value="8" min="0" max="50" step="0.1" inputmode="decimal"><span class="mric-input-suffix">%</span></div></div>
+            <div class="mric-field"><label for="mric-taux">Rendement annuel</label><div class="mric-input-wrap"><input type="number" id="mric-taux" value="8" min="-20" max="50" step="0.1" inputmode="decimal"><span class="mric-input-suffix">%</span></div></div>
             <div class="mric-field"><label for="mric-duree">Durée</label><div class="mric-input-wrap"><input type="number" id="mric-duree" value="20" min="1" max="100" step="1" inputmode="numeric"><span class="mric-input-suffix">ans</span></div></div>
           </div>
           <button class="mric-btn" id="mric-btn-calculer" type="button">Calculer <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
@@ -1521,7 +1521,7 @@
               </div>
               <div class="mric-stats-row mric-2">
                 <div class="mric-stat"><div class="mric-stat-num mric-white" id="mric-total-verse">—</div><div class="mric-stat-lbl">Total versé</div></div>
-                <div class="mric-stat"><div class="mric-stat-num mric-teal" id="mric-interets">—</div><div class="mric-stat-lbl">Intérêts gagnés</div></div>
+                <div class="mric-stat"><div class="mric-stat-num mric-teal" id="mric-interets">—</div><div class="mric-stat-lbl" id="mric-interets-lbl">Intérêts gagnés</div></div>
               </div>
             </div>
 
@@ -1532,8 +1532,8 @@
                 <div class="mric-bar-fill mric-bar-i" id="mric-bar-i" style="width:0"><span class="mric-bar-pct" id="mric-pct-i"></span></div>
               </div>
               <div class="mric-bar-legend">
-                <div class="mric-bar-legend-item"><span class="mric-ldot mric-ldot-v"></span><span>Versé</span> <strong id="mric-legend-v">—</strong></div>
-                <div class="mric-bar-legend-item"><span class="mric-ldot mric-ldot-i"></span><span>Intérêts</span> <strong id="mric-legend-i">—</strong></div>
+                <div class="mric-bar-legend-item"><span class="mric-ldot mric-ldot-v"></span><span id="mric-legend-v-lbl">Versé</span> <strong id="mric-legend-v">—</strong></div>
+                <div class="mric-bar-legend-item"><span class="mric-ldot mric-ldot-i" id="mric-ldot-i"></span><span id="mric-legend-i-lbl">Intérêts</span> <strong id="mric-legend-i">—</strong></div>
               </div>
             </div>
 
@@ -1702,7 +1702,7 @@
           </div>
         </div>
 
-      </div></div>
+      </div>
 
     <div class="mric-table-full">
       <div class="mric-table-container" id="mric-table-container" style="max-width:1100px;margin:0 auto">
@@ -1902,7 +1902,9 @@
     ctx.clearRect(0,0,w,h);
     if(!data.length)return;
 
-    var max=data[data.length-1].solde;
+    var max=0;
+    for(var mi=0;mi<data.length;mi++){if(data[mi].solde>max)max=data[mi].solde;if(data[mi].versementsCumules>max)max=data[mi].versementsCumules;}
+    if(max<=0)max=1;
     var sX=pW/(data.length-1||1);
 
     // Grid
@@ -1955,7 +1957,7 @@
     var xi=Math.max(1,Math.floor(data.length/6));
     for(var x=0;x<data.length;x++){
       if(x%xi!==0&&x!==data.length-1)continue;
-      ctx.fillText('An '+data[x].annee,pL+x*sX,h-pB+8);
+      ctx.fillText(data[x].annee===0?'Départ':'An '+data[x].annee,pL+x*sX,h-pB+8);
     }
   }
 
@@ -1977,18 +1979,38 @@
     legendV.textContent=formatEuro(totalVerse);
     legendI.textContent=formatEuro(interets);
 
-    var pV=capitalFinal>0?(totalVerse/capitalFinal*100):50;
-    var pI=capitalFinal>0?(interets/capitalFinal*100):50;
-    barV.style.width=pV.toFixed(1)+'%';
-    barI.style.width=pI.toFixed(1)+'%';
-    pctV.textContent=pV.toFixed(0)+'%';
-    pctI.textContent=pI.toFixed(0)+'%';
+    // Affichage robuste : gère aussi le cas d'un rendement négatif (perte)
+    var LOSS = interets < 0;
+    interetsEl.style.color = LOSS ? '#FF3B4E' : '';
+    var interetsLbl=document.getElementById('mric-interets-lbl');
+    if(interetsLbl) interetsLbl.textContent = LOSS ? 'Perte nette' : 'Intérêts gagnés';
+    var lblV=document.getElementById('mric-legend-v-lbl'),lblI=document.getElementById('mric-legend-i-lbl'),ldotI=document.getElementById('mric-ldot-i');
+    var denom=Math.max(totalVerse,capitalFinal,1),pV,pI;
+    if(!LOSS){
+      pV=totalVerse/denom*100; pI=interets/denom*100;
+      if(lblV)lblV.textContent='Versé'; if(lblI)lblI.textContent='Intérêts';
+      legendV.textContent=formatEuro(totalVerse); legendI.textContent=formatEuro(interets);
+      if(ldotI)ldotI.style.background=''; barI.style.background='';
+    } else {
+      pV=capitalFinal/denom*100; pI=(-interets)/denom*100;
+      if(lblV)lblV.textContent='Capital restant'; if(lblI)lblI.textContent='Perte';
+      legendV.textContent=formatEuro(capitalFinal); legendI.textContent=formatEuro(-interets);
+      if(ldotI)ldotI.style.background='#FF3B4E'; barI.style.background='#FF3B4E';
+    }
+    pV=Math.max(0,Math.min(100,pV)); pI=Math.max(0,Math.min(100,pI));
+    barV.style.width=pV.toFixed(1)+'%'; barI.style.width=pI.toFixed(1)+'%';
+    pctV.textContent=Math.round(pV)+'%'; pctI.textContent=Math.round(pI)+'%';
 
-    var pctGain=totalVerse>0?((interets/totalVerse)*100).toFixed(0):0;
-    summaryEl.innerHTML='En investissant <strong>'+formatEuro(K0)+'</strong> aujourd\'hui et en ajoutant <strong>'+formatEuro(E)+'</strong> chaque mois pendant <strong>'+duree+' an'+(duree>1?'s':'')+'</strong> à un taux de <strong>'+taux.toFixed(1).replace('.',',')+' %</strong>, votre capital atteindrait <strong>'+formatEuro(capitalFinal)+'</strong>. Les intérêts composés représentent <strong>'+formatEuro(interets)+'</strong>, soit <strong>'+pctGain+' %</strong> de plus que vos versements.';
+    if(!LOSS){
+      var pctGain=totalVerse>0?((interets/totalVerse)*100).toFixed(0):0;
+      summaryEl.innerHTML='En investissant <strong>'+formatEuro(K0)+'</strong> aujourd\'hui et en ajoutant <strong>'+formatEuro(E)+'</strong> chaque mois pendant <strong>'+duree+' an'+(duree>1?'s':'')+'</strong> à un taux de <strong>'+taux.toFixed(1).replace('.',',')+' %</strong>, votre capital atteindrait <strong>'+formatEuro(capitalFinal)+'</strong>. Les intérêts composés représentent <strong>'+formatEuro(interets)+'</strong>, soit <strong>'+pctGain+' %</strong> de plus que vos versements.';
+    } else {
+      var pctLoss=totalVerse>0?((-interets/totalVerse)*100).toFixed(0):0;
+      summaryEl.innerHTML='Avec un rendement de <strong>'+taux.toFixed(1).replace('.',',')+' %</strong>, vos <strong>'+formatEuro(totalVerse)+'</strong> versés sur <strong>'+duree+' an'+(duree>1?'s':'')+'</strong> ne vaudraient plus que <strong>'+formatEuro(capitalFinal)+'</strong>, soit une <strong>perte de '+formatEuro(-interets)+'</strong> ('+pctLoss+'&nbsp;% de vos versements).';
+    }
 
     tableBody.innerHTML='';
-    var solde=K0,yearlyData=[];
+    var solde=K0,yearlyData=[{annee:0,versementsCumules:K0,interetsCumules:0,solde:K0}];
     for(var a=1;a<=duree;a++){
       var vc=K0+E*a*12;
       for(var m=0;m<12;m++){solde=solde*(1+i)+E}
